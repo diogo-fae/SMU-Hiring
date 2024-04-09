@@ -30,4 +30,8 @@ public class Staff {
         this.phoneNumber = phoneNumber;
         this.status = "active";
     }
+
+    public Staff(String userId) {
+        this.userId = userId;
+    }
 }

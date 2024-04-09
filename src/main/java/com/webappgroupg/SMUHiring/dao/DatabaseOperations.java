@@ -3,10 +3,8 @@ package com.webappgroupg.SMUHiring.dao;
 import com.webappgroupg.SMUHiring.model.*;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.Date;
+import java.util.*;
 
 public class DatabaseOperations {
     private Connection connection = null;
@@ -67,6 +65,20 @@ public class DatabaseOperations {
 //        return user;
 //    }
 
+    public void removeDeleteRequest(String userId) {
+        try {
+            String query = "DELETE FROM AccountDeleteRequest WHERE userId = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, userId);
+            preparedStatement.executeUpdate();
+            System.out.println("Delete request has been removed successfully.");
+        } catch (SQLException e) {
+            System.out.println("Exception while removing the delete request - " + e.getMessage());
+        }
+    }
+
+
+
 
     // Create accounts
     public void makePayment(String userId, String paymentId, double paymentAmount, String dueDate, String paymentDate) {
@@ -84,7 +96,8 @@ public class DatabaseOperations {
             System.out.println("Exception while making payment - " + e.getMessage());
         }
     }
-    public void addCredentials(String userId, String password) {
+    public void addCredentials(String userId) {
+        String password = generateRandomString();
         try {
             String query = "INSERT INTO Credentials (userId, password) VALUES (?, ?)";
             preparedStatement = connection.prepareStatement(query);
@@ -96,6 +109,53 @@ public class DatabaseOperations {
             System.out.println("Exception while adding credentials - " + e.getMessage());
         }
     }
+    public static String generateRandomString() {
+        String regularChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String specialChars = "!@#$%^&*()_+{}[]|;:,.<>?";
+        String numbers = "0123456789";
+        StringBuilder sb = new StringBuilder();
+
+        // Add one regular character
+        sb.append(regularChars.charAt(new Random().nextInt(regularChars.length())));
+
+        // Add one special character
+        sb.append(specialChars.charAt(new Random().nextInt(specialChars.length())));
+
+        // Add one number
+        sb.append(numbers.charAt(new Random().nextInt(numbers.length())));
+
+        // Add remaining characters randomly
+        for (int i = 0; i < 5; i++) {
+            String allChars = regularChars + specialChars + numbers;
+            sb.append(allChars.charAt(new Random().nextInt(allChars.length())));
+        }
+
+        // Shuffle the generated string to make it random
+        String randomString = sb.toString();
+        char[] charArray = randomString.toCharArray();
+        for (int i = 0; i < charArray.length; i++) {
+            int randomIndex = new Random().nextInt(charArray.length);
+            char temp = charArray[i];
+            charArray[i] = charArray[randomIndex];
+            charArray[randomIndex] = temp;
+        }
+
+        return new String(charArray);
+    }
+    public void changePassword(String userId, String newPassword){
+        try {
+            String query = "UPDATE Credentials SET password = ? WHERE userId = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, newPassword);
+            preparedStatement.setString(2, userId);
+            preparedStatement.executeUpdate();
+            System.out.println("Password has been changed successfully.");
+        } catch (SQLException e) {
+            System.out.println("Exception while changing the password - " + e.getMessage());
+        }
+    }
+
+
     // With address 2
     public void createEmployerAccount(String userId, String address1, String address2, String city, String state, Integer zipCode, String company) {
         try {
@@ -132,6 +192,44 @@ public class DatabaseOperations {
             System.out.println("Exception while creating the employer account - " + e.getMessage());
         }
     }
+    public void createEmployerAccount(Employer employer) {
+        try {
+            String query = "INSERT INTO Employer (userId, address1, address2, city, state, zipCode, company) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, employer.getUserId());
+            preparedStatement.setString(2, employer.getAddress1());
+            preparedStatement.setString(3, employer.getAddress2());
+            preparedStatement.setString(4, employer.getCity());
+            preparedStatement.setString(5, employer.getState());
+            preparedStatement.setInt(6, employer.getZipCode());
+            preparedStatement.setString(7, employer.getCompany());
+            preparedStatement.execute();
+            System.out.println("Employer record created successfully.");
+        } catch (SQLException e) {
+            System.out.println("Exception while creating the employer account - " + e.getMessage());
+        }
+    }
+    public void createProfessionalAccount(Professional professional) {
+        try {
+            String query = "INSERT INTO Professional (userId, address1, address2, city, state, zipCode, university, graduationDate, degreeType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, professional.getUserId());
+            preparedStatement.setString(2, professional.getAddress1());
+            preparedStatement.setString(3, professional.getAddress2());
+            preparedStatement.setString(4, professional.getCity());
+            preparedStatement.setString(5, professional.getState());
+            preparedStatement.setInt(6, professional.getZipCode());
+            preparedStatement.setString(7, professional.getUniversity());
+            preparedStatement.setString(8, professional.getGraduationDate());
+            preparedStatement.setString(9, professional.getDegreeType());
+            preparedStatement.execute();
+            System.out.println("Professional record created successfully.");
+        } catch (SQLException e) {
+            System.out.println("Exception while creating the professional account - " + e.getMessage());
+        }
+    }
+
+
     // With address 2
     public void createProfessionalAccount(String userId, String address1, String address2, String city, String state, Integer zipCode, String university, String graduationDate, String degreeType) {
         try {
@@ -216,7 +314,7 @@ public class DatabaseOperations {
     public Map<String, List<String>> getProfessionalQualifications(String userId) {
         Map<String, List<String>> professionalQualifications = new HashMap<>();
         try {
-            String query = "SELECT category, keyword FROM ProfessionalQualifications WHERE userId = ?";
+            String query = "SELECT category, keyword FROM ProfessionalQualification WHERE userId = ?";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, userId);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -428,7 +526,7 @@ public class DatabaseOperations {
     }
     public void deleteEmployerRequest(String userId) {
         try {
-            String query = "DELETE FROM EmployerRequest WHERE userId = ?";
+            String query = "DELETE FROM AccountDeleteRequest WHERE userId = ?";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, userId);
             preparedStatement.executeUpdate();
@@ -439,7 +537,7 @@ public class DatabaseOperations {
     }
     public void requestProfessionalDeletion(String userId) {
         try {
-            String query = "INSERT ProfessionalRequest (userId, requestType) VALUES(?, ?)";
+            String query = "INSERT AccountDeleteRequest (userId, requestType) VALUES(?, ?)";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, userId);
             preparedStatement.setString(1, "Delete");
@@ -557,8 +655,6 @@ public class DatabaseOperations {
         createProfessionalAccount(userId, address1, city, state, zipCode, university, graduationDate, degreeType);
     }
     public void deleteEmployerFromRequest(String userId) {
-        // Retrieve the request and delete it
-        deleteEmployerRequest(userId);
         // Update the status of the user to inactive
         try {
             String query = "UPDATE User SET status = ? WHERE userId = ?";
@@ -572,8 +668,6 @@ public class DatabaseOperations {
         }
     }
     public void deleteProfessionalFromRequest(String userId) {
-        // Retrieve the request and delete it
-        deleteProfessionalRequest(userId);
         // Update the status of the user to inactive
         try {
             String query = "UPDATE User SET status = ? WHERE userId = ?";
@@ -588,7 +682,7 @@ public class DatabaseOperations {
     }
     public ResultSet getJobsWithCategory(String category) {
         try {
-            String query = "SELECT jobId, company, keyword FROM JobQualifications WHERE category = ?";
+            String query = "SELECT jobId, company, keyword FROM JobQualification WHERE category = ?";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, category);
             return preparedStatement.executeQuery();
@@ -597,9 +691,8 @@ public class DatabaseOperations {
         }
         return null;
     }
-    public void initiateJobMatchingFromRequest(String userId) {
-        // Retrieve the request and delete it
-        deleteProfessionalRequest(userId);
+    public void initiateJobMatching(String userId) {
+        int jobMatchesCount = 0;
         // Get all skills from ProfessionalQualifications
         Map<String, List<String>> professionalSkills = getProfessionalQualifications(userId);
 
@@ -625,31 +718,190 @@ public class DatabaseOperations {
                         // Create JobMatching
                         System.out.println("Match found for jobId: " + jobId + " and company: " + company);
                         createJobMatching(userId, jobId, company);
+                        jobMatchesCount++;
                     }
                 }
             } catch (SQLException e) {
                 // No more jobs
             }
         }
+        if (jobMatchesCount == 0) {
+            System.out.println("No job matches found for the professional " + userId + ".");
+        }
+    }
+
+    public ArrayList<JobMatching> getJobMatches(String userId) {
+        ArrayList<JobMatching> jobMatchings = new ArrayList<JobMatching>();
+        JobMatching tempJobMatching = new JobMatching(userId);
+
+        try {
+            String query = "SELECT * FROM JobMatching WHERE userId = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                tempJobMatching.setJobId(resultSet.getString("jobId"));
+                tempJobMatching.setCompany(resultSet.getString("company"));
+                jobMatchings.add(tempJobMatching);
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while retrieving job matching request: " + e.getMessage());
+        }
+        return jobMatchings;
     }
 
     // Root
-    public void createUserAccount(String userId, String firstName, String lastName, String email, Integer phone, String userType) {
+    public void createUserAccount(User user) {
         try {
             String query = "INSERT INTO User (userId, firstName, lastName, email, phoneNumber, status, userType) VALUES (?, ?, ?, ?, ?, ?, ?)";
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, userId);
-            preparedStatement.setString(2, firstName);
-            preparedStatement.setString(3, lastName);
-            preparedStatement.setString(4, email);
-            preparedStatement.setInt(5, phone);
+            preparedStatement.setString(1, user.getUserId());
+            preparedStatement.setString(2, user.getFirstName());
+            preparedStatement.setString(3, user.getLastName());
+            preparedStatement.setString(4, user.getEmail());
+            preparedStatement.setInt(5, user.getPhoneNumber());
             preparedStatement.setString(6, "active");
-            preparedStatement.setString(7, userType);
+            preparedStatement.setString(7, String.valueOf(user.getUserType()));
             preparedStatement.execute();
             System.out.println("User record created successfully.");
+            addCredentials(user.getUserId());
         } catch (SQLException e) {
             System.out.println("Exception while creating the user account - " + e.getMessage());
         }
+    }
+
+    public void createUserAccount(Staff user) {
+        try {
+            String query = "INSERT INTO User (userId, firstName, lastName, email, phoneNumber, status, userType) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, user.getUserId());
+            preparedStatement.setString(2, user.getFirstName());
+            preparedStatement.setString(3, user.getLastName());
+            preparedStatement.setString(4, user.getEmail());
+            preparedStatement.setInt(5, user.getPhoneNumber());
+            preparedStatement.setString(6, "active");
+            preparedStatement.setString(7, "S");
+            preparedStatement.execute();
+            System.out.println("User record created successfully.");
+            addCredentials(user.getUserId());
+        } catch (SQLException e) {
+            System.out.println("Exception while creating the user account - " + e.getMessage());
+        }
+    }
+
+    public Character getUserType(String userId) {
+        try {
+            String query = "SELECT userType FROM User WHERE userId = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getString("userType").charAt(0);
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while retrieving user type: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public void removeEmployerCreateRequest(String userId) {
+        try {
+            String query = "DELETE FROM EmployerCreateRequest WHERE userId = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, userId);
+            preparedStatement.executeUpdate();
+            System.out.println("Employer request has been removed successfully.");
+        } catch (SQLException e) {
+            System.out.println("Exception while removing the employer request - " + e.getMessage());
+        }
+    }
+    public void removeProfessionalCreateRequest(String userId) {
+        try {
+            String query = "DELETE FROM ProfessionalCreateRequest WHERE userId = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, userId);
+            preparedStatement.executeUpdate();
+            System.out.println("Professional request has been removed successfully.");
+        } catch (SQLException e) {
+            System.out.println("Exception while removing the professional request - " + e.getMessage());
+        }
+    }
+
+    public Employer getEmployerCreateRequest(String userId) {
+        Employer employer = new Employer(userId);
+
+        try {
+            String query = "SELECT * FROM EmployerCreateRequest WHERE userId = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                employer.setFirstName(resultSet.getString("firstName"));
+                employer.setLastName(resultSet.getString("lastName"));
+                employer.setEmail(resultSet.getString("email"));
+                employer.setPhoneNumber(resultSet.getInt("phoneNumber"));
+                employer.setAddress1(resultSet.getString("address1"));
+                employer.setAddress2(resultSet.getString("address2"));
+                employer.setCity(resultSet.getString("city"));
+                employer.setState(resultSet.getString("state"));
+                employer.setZipCode(resultSet.getInt("zipCode"));
+                employer.setCompany(resultSet.getString("company"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while retrieving employer create request: " + e.getMessage());
+        }
+        return employer;
+    }
+
+    public Professional getProfessionalCreateRequest(String userId) {
+        Professional professional = new Professional(userId);
+
+        try {
+            String query = "SELECT * FROM ProfessionalCreateRequest WHERE userId = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                professional.setFirstName(resultSet.getString("firstName"));
+                professional.setLastName(resultSet.getString("lastName"));
+                professional.setEmail(resultSet.getString("email"));
+                professional.setPhoneNumber(resultSet.getInt("phoneNumber"));
+                professional.setAddress1(resultSet.getString("address1"));
+                professional.setAddress2(resultSet.getString("address2"));
+                professional.setCity(resultSet.getString("city"));
+                professional.setState(resultSet.getString("state"));
+                professional.setZipCode(resultSet.getInt("zipCode"));
+                professional.setUniversity(resultSet.getString("university"));
+                professional.setGraduationDate(resultSet.getString("graduationDate"));
+                professional.setDegreeType(resultSet.getString("degreeType"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while retrieving professional create request: " + e.getMessage());
+        }
+        return professional;
+    }
+
+    public Staff getStaffUser(String userId){
+        Staff staffUser = new Staff(userId);
+        try {
+            String query = "SELECT * FROM User WHERE userId = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                String firstName = resultSet.getString("firstName");
+                String lastName = resultSet.getString("lastName");
+                String email = resultSet.getString("email");
+                int phoneNumber = resultSet.getInt("phoneNumber");
+                String status = resultSet.getString("status");
+                staffUser = new Staff(userId, firstName, lastName, email, phoneNumber, status);
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while retrieving staff user: " + e.getMessage());
+        }
+        return staffUser;
+
     }
 
 

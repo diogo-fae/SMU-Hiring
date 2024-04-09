@@ -6,15 +6,18 @@ import com.webappgroupg.SMUHiring.model.Staff;
 public class RootOperations {
     private DatabaseOperations dbOps = new DatabaseOperations();
 
-    public void createStaff(String userId, String firstName, String lastName, String email, int phoneNumber) {
-        Staff newStaff = new Staff(userId, firstName, lastName, email, phoneNumber);
+    // Constructor
+    public RootOperations() {
+    }
 
-        dbOps.createUserAccount(newStaff.getUserId(), newStaff.getFirstName(), newStaff.getLastName(), newStaff.getEmail(), newStaff.getPhoneNumber(), "S");
+    public void createStaff(String userId, String firstName, String lastName, String email, int phoneNumber) {
+        Staff staff = new Staff(userId, firstName, lastName, email, phoneNumber, "active");
+        dbOps.createUserAccount(staff);
     }
 
     // TODO: Delete, used for testing
-//    public static void main(String[] args) {
-//        RootOperations rootOps = new RootOperations();
-//        rootOps.createStaff("1234", "John", "Doe", "john.doe@gmail.com", 1234567890);
-//    }
+    public static void main(String[] args) {
+        RootOperations rootOps = new RootOperations();
+        rootOps.createStaff("staffX", "John", "Doe", "john.doe@gmail.com", 1234567890);
+    }
 }
