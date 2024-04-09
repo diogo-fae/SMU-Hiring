@@ -13,9 +13,11 @@ public class StaffOperations {
     public StaffOperations(String userId) {
         this.staffUser = dbOps.getStaffUser(userId);
     }
-
     public StaffOperations(String userId, String firstName, String lastName, String email, int phoneNumber) {
         this.staffUser = new Staff(userId, firstName, lastName, email, phoneNumber);
+    }
+    public void closeConnection(){
+        dbOps.closeConnection();
     }
 
 
@@ -104,6 +106,7 @@ public class StaffOperations {
 //        staffOps.initiateJobMatching("profX");
 //        System.out.println(staffOps.getJobMatches("prof2"));
 //        staffOps.changePassword("newPassword");
+        staffOps.closeConnection();
     }
 
 }

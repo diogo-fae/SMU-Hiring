@@ -31,6 +31,7 @@ public class DatabaseOperations {
             if (resultSet != null) resultSet.close();
             if (preparedStatement != null) preparedStatement.close();
             if (connection != null) connection.close();
+            System.out.println("Connection closed successfully.");
         } catch (SQLException e) {
             System.out.println("SQLException while closing the connection - " + e.getMessage());
         }
