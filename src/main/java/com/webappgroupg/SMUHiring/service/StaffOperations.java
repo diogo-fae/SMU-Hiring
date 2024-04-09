@@ -97,7 +97,7 @@ public class StaffOperations {
     public static void main(String[] args) {
         StaffOperations staffOps = new StaffOperations("staff1");
 
-//        staffOps.reviewEmployerCreateRequest("approve", "empX");
+//        staffOps.reviewEmployerCreateRequest("approve", "test");
 //        staffOps.reviewProfessionalCreateRequest("approve", "profX");
 //        staffOps.reviewDeleteRequest("empX", "approve");
 //        staffOps.reviewDeleteRequest("profX", "approve");

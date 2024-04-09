@@ -512,6 +512,17 @@ public class DatabaseOperations {
     }
 
     // Deletes
+    public void requestAccountDeletion(String userId) {
+        try {
+            String query = "INSERT INTO AccountDeleteRequest (userId) VALUES (?)";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, userId);
+            preparedStatement.execute();
+            System.out.println("Account deletion request has been sent successfully.");
+        } catch (SQLException e) {
+            System.out.println("Exception while sending the account deletion request - " + e.getMessage());
+        }
+    }
     public void requestEmployerDeletion(String userId) {
         try {
             String query = "INSERT EmployerRequest (userId, requestType) VALUES(?, ?)";
@@ -901,6 +912,28 @@ public class DatabaseOperations {
             System.out.println("Exception while retrieving staff user: " + e.getMessage());
         }
         return staffUser;
+    }
+
+    public void requestNewEmployerAccount(Employer employer) {
+        try {
+            String query = "INSERT INTO EmployerCreateRequest (userId, firstName, lastName, email, phoneNumber, address1, address2, city, state, zipCode, company) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, employer.getUserId());
+            preparedStatement.setString(2, employer.getFirstName());
+            preparedStatement.setString(3, employer.getLastName());
+            preparedStatement.setString(4, employer.getEmail());
+            preparedStatement.setInt(5, employer.getPhoneNumber());
+            preparedStatement.setString(6, employer.getAddress1());
+            preparedStatement.setString(7, employer.getAddress2());
+            preparedStatement.setString(8, employer.getCity());
+            preparedStatement.setString(9, employer.getState());
+            preparedStatement.setInt(10, employer.getZipCode());
+            preparedStatement.setString(11, employer.getCompany());
+            preparedStatement.execute();
+            System.out.println("Employer request created successfully.");
+        } catch (SQLException e) {
+            System.out.println("Exception while creating the employer request - " + e.getMessage());
+        }
 
     }
 
