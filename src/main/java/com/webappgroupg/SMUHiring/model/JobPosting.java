@@ -3,6 +3,7 @@ package com.webappgroupg.SMUHiring.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.boot.autoconfigure.batch.BatchProperties;
 
 @Getter
 @Setter
@@ -29,5 +30,25 @@ public class JobPosting {
         this.startTime = startTime;
         this.endTime = endTime;
         this.payPerHour = payPerHour;
+    }
+
+    public JobPosting(String company) {
+        this.company = company;
+    }
+
+    @Override
+    public String toString() {
+        return "JobPosting{" +
+                "jobId=" + jobId +
+                ", company='" + company + '\'' +
+                ", positionName='" + positionName + '\'' +
+                ", supervisorName='" + supervisorName + '\'' +
+                ", supervisorEmail='" + supervisorEmail + '\'' +
+                ", startDate='" + startDate + '\'' +
+                ", endDate='" + endDate + '\'' +
+                ", startTime='" + startTime + '\'' +
+                ", endTime='" + endTime + '\'' +
+                ", payPerHour=" + payPerHour +
+                '}';
     }
 }

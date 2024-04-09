@@ -96,6 +96,21 @@ public class DatabaseOperations {
             System.out.println("Exception while making payment - " + e.getMessage());
         }
     }
+    public void makePayment(Payment payment) {
+        try {
+            String query = "INSERT INTO Payment (userId, paymentId, paymentAmount, dueDate, paymentDate) VALUES (?, ?, ?, ?, ?)";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, payment.getUserId());
+            preparedStatement.setString(2, payment.getPaymentId());
+            preparedStatement.setDouble(3, payment.getPaymentAmount());
+            preparedStatement.setDate(4, java.sql.Date.valueOf(payment.getDueDate()));
+            preparedStatement.setDate(5, java.sql.Date.valueOf(payment.getPaymentDate()));
+            preparedStatement.execute();
+            System.out.println("Payment made successfully.");
+        } catch (SQLException e) {
+            System.out.println("Exception while making payment - " + e.getMessage());
+        }
+    }
     public void addCredentials(String userId) {
         String password = generateRandomString();
         try {
@@ -368,7 +383,7 @@ public class DatabaseOperations {
     }
     public void createJobQualification(Integer jobId, String company, String category, String keyword) {
         try {
-            String query = "INSERT INTO JobQualifications (jobId, company, category, keyword) VALUES (?, ?, ?, ?)";
+            String query = "INSERT INTO JobQualification (jobId, company, category, keyword) VALUES (?, ?, ?, ?)";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, jobId);
             preparedStatement.setString(2, company);
@@ -378,6 +393,20 @@ public class DatabaseOperations {
             System.out.println("Job qualification created successfully.");
         } catch (SQLException e) {
             System.out.println("Exception while creating the job qualification - " + e.getMessage());
+        }
+    }
+    public void deleteJobQualification(Integer jobId, String company, String category, String keyword) {
+        try {
+            String query = "DELETE FROM JobQualification WHERE jobId = ? AND company = ? AND category = ? AND keyword = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, jobId);
+            preparedStatement.setString(2, company);
+            preparedStatement.setString(3, category);
+            preparedStatement.setString(4, keyword);
+            preparedStatement.executeUpdate();
+            System.out.println("Job qualification deleted successfully.");
+        } catch (SQLException e) {
+            System.out.println("Exception while deleting the job qualification - " + e.getMessage());
         }
     }
     public void createJobMatching(String profUserId, Integer jobId, String company){
@@ -743,7 +772,7 @@ public class DatabaseOperations {
 
     public ArrayList<JobMatching> getJobMatches(String userId) {
         ArrayList<JobMatching> jobMatchings = new ArrayList<JobMatching>();
-        JobMatching tempJobMatching = new JobMatching(userId);
+
 
         try {
             String query = "SELECT * FROM JobMatching WHERE userId = ?";
@@ -752,6 +781,7 @@ public class DatabaseOperations {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
+                JobMatching tempJobMatching = new JobMatching(userId);
                 tempJobMatching.setJobId(resultSet.getString("jobId"));
                 tempJobMatching.setCompany(resultSet.getString("company"));
                 jobMatchings.add(tempJobMatching);
@@ -934,10 +964,85 @@ public class DatabaseOperations {
         } catch (SQLException e) {
             System.out.println("Exception while creating the employer request - " + e.getMessage());
         }
-
     }
 
+    public ArrayList<JobPosting> getJobPostings(String company) {
+        ArrayList<JobPosting> jobPostings = new ArrayList<JobPosting>();
 
+        try {
+            String query = "SELECT * FROM JobPosting WHERE company = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, company);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                JobPosting tempJobPosting = new JobPosting(company);
+                tempJobPosting.setJobId(resultSet.getInt("jobId"));
+                tempJobPosting.setCompany(resultSet.getString("company"));
+                tempJobPosting.setPositionName(resultSet.getString("positionName"));
+                tempJobPosting.setSupervisorName(resultSet.getString("supervisorName"));
+                tempJobPosting.setSupervisorEmail(resultSet.getString("supervisorEmail"));
+                tempJobPosting.setStartDate(resultSet.getDate("startDate").toString());
+                tempJobPosting.setEndDate(resultSet.getDate("endDate").toString());
+                tempJobPosting.setStartTime(resultSet.getTime("startTime").toString());
+                tempJobPosting.setEndTime(resultSet.getTime("endTime").toString());
+                tempJobPosting.setPayPerHour(resultSet.getDouble("payPerHour"));
+                jobPostings.add(tempJobPosting);
+                System.out.println(tempJobPosting.getJobId());
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while retrieving job postings: " + e.getMessage());
+        }
+        System.out.println(jobPostings);
+        return jobPostings;
+    }
+
+    public String getEmployerCompany(String userId) {
+        String company = "";
+        try {
+            String query = "SELECT company FROM Employer WHERE userId = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                company = resultSet.getString("company");
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while retrieving employer: " + e.getMessage());
+        }
+        return company;
+    }
+
+    public void updateEmployerAccount(Employer employer) {
+        try {
+            String query = "UPDATE Employer SET address1 = ?, address2 = ?, city = ?, state = ?, zipCode = ?, company = ? WHERE userId = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, employer.getAddress1());
+            preparedStatement.setString(2, employer.getAddress2());
+            preparedStatement.setString(3, employer.getCity());
+            preparedStatement.setString(4, employer.getState());
+            preparedStatement.setInt(5, employer.getZipCode());
+            preparedStatement.setString(6, employer.getCompany());
+            preparedStatement.setString(7, employer.getUserId());
+            preparedStatement.executeUpdate();
+            System.out.println("Employer record has been updated successfully.");
+        } catch (SQLException e) {
+            System.out.println("Exception while updating the employer account - " + e.getMessage());
+        }
+        try {
+            String query = "UPDATE User SET firstName = ?, lastName = ?, email = ?, phoneNumber = ? WHERE userId = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, employer.getFirstName());
+            preparedStatement.setString(2, employer.getLastName());
+            preparedStatement.setString(3, employer.getEmail());
+            preparedStatement.setInt(4, employer.getPhoneNumber());
+            preparedStatement.setString(5, employer.getUserId());
+            preparedStatement.executeUpdate();
+            System.out.println("User record has been updated successfully.");
+        } catch (SQLException e) {
+            System.out.println("Exception while updating the user account - " + e.getMessage());
+        }
+    }
 
 //    public static void main(String[] args) {
 //        DatabaseOperations dbOps = new DatabaseOperations();

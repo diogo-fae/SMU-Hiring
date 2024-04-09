@@ -53,4 +53,10 @@ public class Employer {
     public Employer(String userId) {
         this.userId = userId;
     }
+
+    @Override
+    public String toString() {
+        return "Employer{" +
+                "userId='" + userId + '}';
+    }
 }
