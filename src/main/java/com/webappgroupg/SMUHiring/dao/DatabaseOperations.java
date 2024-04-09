@@ -54,7 +54,7 @@ public class DatabaseOperations {
 //                String rsFirstName = resultSet.getString("firstName");
 //                String rsLastName = resultSet.getString("lastName");
 //                String rsEmail = resultSet.getString("email");
-//                int rsPhoneNumber = resultSet.getInt("phoneNumber");
+//                int rsPhoneNumber = resultSet.getLong("phoneNumber");
 //                String rsStatus = resultSet.getString("status");
 //                String rsUserType = resultSet.getString("userType");
 //
@@ -802,7 +802,7 @@ public class DatabaseOperations {
             preparedStatement.setString(2, user.getFirstName());
             preparedStatement.setString(3, user.getLastName());
             preparedStatement.setString(4, user.getEmail());
-            preparedStatement.setInt(5, user.getPhoneNumber());
+            preparedStatement.setLong(5, user.getPhoneNumber());
             preparedStatement.setString(6, "active");
             preparedStatement.setString(7, String.valueOf(user.getUserType()));
             preparedStatement.execute();
@@ -821,7 +821,7 @@ public class DatabaseOperations {
             preparedStatement.setString(2, user.getFirstName());
             preparedStatement.setString(3, user.getLastName());
             preparedStatement.setString(4, user.getEmail());
-            preparedStatement.setInt(5, user.getPhoneNumber());
+            preparedStatement.setLong(5, user.getPhoneNumber());
             preparedStatement.setString(6, "active");
             preparedStatement.setString(7, "S");
             preparedStatement.execute();
@@ -882,7 +882,7 @@ public class DatabaseOperations {
                 employer.setFirstName(resultSet.getString("firstName"));
                 employer.setLastName(resultSet.getString("lastName"));
                 employer.setEmail(resultSet.getString("email"));
-                employer.setPhoneNumber(resultSet.getInt("phoneNumber"));
+                employer.setPhoneNumber(resultSet.getLong("phoneNumber"));
                 employer.setAddress1(resultSet.getString("address1"));
                 employer.setAddress2(resultSet.getString("address2"));
                 employer.setCity(resultSet.getString("city"));
@@ -908,7 +908,7 @@ public class DatabaseOperations {
                 professional.setFirstName(resultSet.getString("firstName"));
                 professional.setLastName(resultSet.getString("lastName"));
                 professional.setEmail(resultSet.getString("email"));
-                professional.setPhoneNumber(resultSet.getInt("phoneNumber"));
+                professional.setPhoneNumber(resultSet.getLong("phoneNumber"));
                 professional.setAddress1(resultSet.getString("address1"));
                 professional.setAddress2(resultSet.getString("address2"));
                 professional.setCity(resultSet.getString("city"));
@@ -935,7 +935,7 @@ public class DatabaseOperations {
                 String firstName = resultSet.getString("firstName");
                 String lastName = resultSet.getString("lastName");
                 String email = resultSet.getString("email");
-                int phoneNumber = resultSet.getInt("phoneNumber");
+                long phoneNumber = resultSet.getLong("phoneNumber");
                 String status = resultSet.getString("status");
                 staffUser = new Staff(userId, firstName, lastName, email, phoneNumber, status);
             }
@@ -953,7 +953,7 @@ public class DatabaseOperations {
             preparedStatement.setString(2, employer.getFirstName());
             preparedStatement.setString(3, employer.getLastName());
             preparedStatement.setString(4, employer.getEmail());
-            preparedStatement.setInt(5, employer.getPhoneNumber());
+            preparedStatement.setLong(5, employer.getPhoneNumber());
             preparedStatement.setString(6, employer.getAddress1());
             preparedStatement.setString(7, employer.getAddress2());
             preparedStatement.setString(8, employer.getCity());
@@ -1036,13 +1036,130 @@ public class DatabaseOperations {
             preparedStatement.setString(1, employer.getFirstName());
             preparedStatement.setString(2, employer.getLastName());
             preparedStatement.setString(3, employer.getEmail());
-            preparedStatement.setInt(4, employer.getPhoneNumber());
+            preparedStatement.setLong(4, employer.getPhoneNumber());
             preparedStatement.setString(5, employer.getUserId());
             preparedStatement.executeUpdate();
             System.out.println("User record has been updated successfully.");
         } catch (SQLException e) {
             System.out.println("Exception while updating the user account - " + e.getMessage());
         }
+    }
+
+    public ArrayList<Employer> getEmployers() {
+        ArrayList<Employer> employers = new ArrayList<Employer>();
+
+        // Get all users that are Employers
+        try {
+            String query = "SELECT userId FROM User WHERE userType = 'E'";
+            preparedStatement = connection.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String userId = resultSet.getString("userId");
+                // Get the Employer object with all details
+                Employer tempEmployer = getEmployerDetails(userId);
+
+                employers.add(tempEmployer);
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while retrieving employers: " + e.getMessage());
+        }
+        return employers;
+    }
+    public Employer getEmployerDetails(String userId){
+        // Returns an Employer object from the userId
+        Employer employer = new Employer(userId);
+        try {
+            String query = "SELECT * FROM User WHERE userId = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                employer.setFirstName(resultSet.getString("firstName"));
+                employer.setLastName(resultSet.getString("lastName"));
+                employer.setEmail(resultSet.getString("email"));
+                employer.setPhoneNumber(resultSet.getLong("phoneNumber"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while retrieving employer details: " + e.getMessage());
+        }
+        try {
+            String query = "SELECT * FROM Employer WHERE userId = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                employer.setAddress1(resultSet.getString("address1"));
+                employer.setAddress2(resultSet.getString("address2"));
+                employer.setCity(resultSet.getString("city"));
+                employer.setState(resultSet.getString("state"));
+                employer.setZipCode(resultSet.getInt("zipCode"));
+                employer.setCompany(resultSet.getString("company"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while retrieving employer details: " + e.getMessage());
+        }
+        return employer;
+    }
+
+    public ArrayList<Professional> getProfessionals() {
+        ArrayList<Professional> professionals = new ArrayList<Professional>();
+
+        // Get all users that are Professionals
+        try {
+            String query = "SELECT userId FROM User WHERE userType = 'P'";
+            preparedStatement = connection.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String userId = resultSet.getString("userId");
+                // Get the Professional object with all details
+                Professional tempProfessional = getProfessionalDetails(userId);
+
+                professionals.add(tempProfessional);
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while retrieving professionals: " + e.getMessage());
+        }
+        return professionals;
+    }
+    public Professional getProfessionalDetails(String userId){
+        // Returns a Professional object from the userId
+        Professional professional = new Professional(userId);
+        try {
+            String query = "SELECT * FROM User WHERE userId = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                professional.setFirstName(resultSet.getString("firstName"));
+                professional.setLastName(resultSet.getString("lastName"));
+                professional.setEmail(resultSet.getString("email"));
+                professional.setPhoneNumber(resultSet.getLong("phoneNumber"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while retrieving professional details: " + e.getMessage());
+        }
+        try {
+            String query = "SELECT * FROM Professional WHERE userId = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                professional.setAddress1(resultSet.getString("address1"));
+                professional.setAddress2(resultSet.getString("address2"));
+                professional.setCity(resultSet.getString("city"));
+                professional.setState(resultSet.getString("state"));
+                professional.setZipCode(resultSet.getInt("zipCode"));
+                professional.setUniversity(resultSet.getString("university"));
+                professional.setGraduationDate(resultSet.getString("graduationDate"));
+                professional.setDegreeType(resultSet.getString("degreeType"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while retrieving professional details: " + e.getMessage());
+        }
+        return professional;
+
     }
 
 //    public static void main(String[] args) {

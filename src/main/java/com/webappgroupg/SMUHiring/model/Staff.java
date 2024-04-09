@@ -11,10 +11,10 @@ public class Staff {
     private String firstName;
     private String lastName;
     private String email;
-    private int phoneNumber;
+    private long phoneNumber;
     private String status;
 
-    public Staff(String userId, String firstName, String lastName, String email, int phoneNumber, String status) {
+    public Staff(String userId, String firstName, String lastName, String email, long phoneNumber, String status) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -22,7 +22,7 @@ public class Staff {
         this.phoneNumber = phoneNumber;
         this.status = status;
     }
-    public Staff(String userId, String firstName, String lastName, String email, int phoneNumber) {
+    public Staff(String userId, String firstName, String lastName, String email, long phoneNumber) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;

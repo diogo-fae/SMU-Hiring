@@ -12,7 +12,7 @@ public class Professional {
     private String firstName;
     private String lastName;
     private String email;
-    private int phoneNumber;
+    private long phoneNumber;
     private String status;
     private String address1;
     private String address2;
@@ -23,7 +23,7 @@ public class Professional {
     private String graduationDate;
     private String degreeType;
 
-    public Professional(String userId, String firstName, String lastName, String email, int phoneNumber, String status, String address1, String address2, String city, String state, int zipCode, String university, String graduationDate, String degreeType) {
+    public Professional(String userId, String firstName, String lastName, String email, long phoneNumber, String status, String address1, String address2, String city, String state, int zipCode, String university, String graduationDate, String degreeType) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -41,7 +41,7 @@ public class Professional {
     }
 
     // No address2
-    public Professional(String userId, String firstName, String lastName, String email, int phoneNumber, String status, String address1, String city, String state, int zipCode, String university, String graduationDate, String degreeType) {
+    public Professional(String userId, String firstName, String lastName, String email, long phoneNumber, String status, String address1, String city, String state, int zipCode, String university, String graduationDate, String degreeType) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -60,5 +60,11 @@ public class Professional {
 
     public Professional(String userId) {
         this.userId = userId;
+    }
+
+    @Override
+    public String toString() {
+        return "Professional{" +
+                "userId='" + userId + '}';
     }
 }

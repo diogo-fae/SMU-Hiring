@@ -29,7 +29,7 @@ public class EmployerOperations {
     public void requestNewAccount() {
         dbOps.requestNewEmployerAccount(employerUser);
     }
-    public void requestNewAccount(String firstName, String lastName, String email, int phoneNumber, String status, String address1, String address2, String city, String state, int zipCode, String company) {
+    public void requestNewAccount(String firstName, String lastName, String email, long phoneNumber, String status, String address1, String address2, String city, String state, int zipCode, String company) {
         employerUser.setFirstName(firstName);
         employerUser.setLastName(lastName);
         employerUser.setEmail(email);

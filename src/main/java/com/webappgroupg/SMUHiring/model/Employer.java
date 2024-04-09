@@ -10,7 +10,7 @@ public class Employer {
     private String firstName;
     private String lastName;
     private String email;
-    private int phoneNumber;
+    private long phoneNumber;
     private String status;
     private String address1;
     private String address2;
@@ -19,7 +19,7 @@ public class Employer {
     private int zipCode;
     private String company;
 
-    public Employer(String userId, String firstName, String lastName, String email, int phoneNumber, String status, String address1, String address2, String city, String state, int zipCode, String company) {
+    public Employer(String userId, String firstName, String lastName, String email, long phoneNumber, String status, String address1, String address2, String city, String state, int zipCode, String company) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -35,7 +35,7 @@ public class Employer {
     }
 
     // No address2
-    public Employer(String userId, String firstName, String lastName, String email, int phoneNumber, String status, String address1, String city, String state, int zipCode, String company) {
+    public Employer(String userId, String firstName, String lastName, String email, long phoneNumber, String status, String address1, String city, String state, int zipCode, String company) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;

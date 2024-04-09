@@ -94,6 +94,14 @@ public class StaffOperations {
         dbOps.changePassword(staffUser.getUserId(), newPassword);
     }
 
+    // View users
+    public ArrayList<Employer> viewEmployers() {
+        return dbOps.getEmployers();
+    }
+    public ArrayList<Professional> viewProfessionals() {
+        return dbOps.getProfessionals();
+    }
+
 
     // Main function to call all the functions
     public static void main(String[] args) {
@@ -106,6 +114,8 @@ public class StaffOperations {
 //        staffOps.initiateJobMatching("profX");
 //        System.out.println(staffOps.getJobMatches("prof2"));
 //        staffOps.changePassword("newPassword");
+//        System.out.println(staffOps.viewEmployers());
+//        System.out.println(staffOps.viewProfessionals());
         staffOps.closeConnection();
     }
 
