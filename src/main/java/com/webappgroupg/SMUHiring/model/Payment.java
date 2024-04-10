@@ -20,4 +20,18 @@ public class Payment {
         this.paymentDate = paymentDate;
         this.dueDate = dueDate;
     }
+
+    public Payment() {
+    }
+
+    @Override
+    public String toString() {
+        return "Payment{" +
+                "userId='" + userId + '\'' +
+                ", paymentId='" + paymentId + '\'' +
+                ", paymentAmount=" + paymentAmount +
+                ", paymentDate='" + paymentDate + '\'' +
+                ", dueDate='" + dueDate + '\'' +
+                '}';
+    }
 }

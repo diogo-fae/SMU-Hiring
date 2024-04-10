@@ -20,7 +20,7 @@ public class DatabaseOperations {
             // Load JDBC driver and establish connection
             Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-            System.out.println(connection);
+//            System.out.println(connection);
         } catch (Exception e) {
             System.out.println("Exception while creating the connection - " + e.getMessage());
         }
@@ -72,7 +72,7 @@ public class DatabaseOperations {
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, userId);
             preparedStatement.executeUpdate();
-            System.out.println("Delete request has been removed successfully.");
+//            System.out.println("Delete request has been removed successfully.");
         } catch (SQLException e) {
             System.out.println("Exception while removing the delete request - " + e.getMessage());
         }
@@ -120,7 +120,7 @@ public class DatabaseOperations {
             preparedStatement.setString(1, userId);
             preparedStatement.setString(2, password);
             preparedStatement.execute();
-            System.out.println("Credentials added successfully.");
+//            System.out.println("Credentials added successfully.");
         } catch (SQLException e) {
             System.out.println("Exception while adding credentials - " + e.getMessage());
         }
@@ -165,7 +165,7 @@ public class DatabaseOperations {
             preparedStatement.setString(1, newPassword);
             preparedStatement.setString(2, userId);
             preparedStatement.executeUpdate();
-            System.out.println("Password has been changed successfully.");
+//            System.out.println("Password has been changed successfully.");
         } catch (SQLException e) {
             System.out.println("Exception while changing the password - " + e.getMessage());
         }
@@ -185,7 +185,7 @@ public class DatabaseOperations {
             preparedStatement.setInt(6, zipCode);
             preparedStatement.setString(7, company);
             preparedStatement.execute();
-            System.out.println("Employer record created successfully.");
+//            System.out.println("Employer record created successfully.");
         } catch (SQLException e) {
             System.out.println("Exception while creating the employer account - " + e.getMessage());
         }
@@ -203,7 +203,7 @@ public class DatabaseOperations {
             preparedStatement.setInt(6, zipCode);
             preparedStatement.setString(7, company);
             preparedStatement.execute();
-            System.out.println("Employer record created successfully.");
+//            System.out.println("Employer record created successfully.");
         } catch (SQLException e) {
             System.out.println("Exception while creating the employer account - " + e.getMessage());
         }
@@ -220,7 +220,7 @@ public class DatabaseOperations {
             preparedStatement.setInt(6, employer.getZipCode());
             preparedStatement.setString(7, employer.getCompany());
             preparedStatement.execute();
-            System.out.println("Employer record created successfully.");
+//            System.out.println("Employer record created successfully.");
         } catch (SQLException e) {
             System.out.println("Exception while creating the employer account - " + e.getMessage());
         }
@@ -239,7 +239,7 @@ public class DatabaseOperations {
             preparedStatement.setString(8, professional.getGraduationDate());
             preparedStatement.setString(9, professional.getDegreeType());
             preparedStatement.execute();
-            System.out.println("Professional record created successfully.");
+//            System.out.println("Professional record created successfully.");
         } catch (SQLException e) {
             System.out.println("Exception while creating the professional account - " + e.getMessage());
         }
@@ -261,7 +261,7 @@ public class DatabaseOperations {
             preparedStatement.setString(8, graduationDate);
             preparedStatement.setString(9, degreeType);
             preparedStatement.execute();
-            System.out.println("Professional record created successfully.");
+//            System.out.println("Professional record created successfully.");
         } catch (SQLException e) {
             System.out.println("Exception while creating the professional account - " + e.getMessage());
         }
@@ -281,7 +281,7 @@ public class DatabaseOperations {
             preparedStatement.setString(8, graduationDate);
             preparedStatement.setString(9, degreeType);
             preparedStatement.execute();
-            System.out.println("Professional record created successfully.");
+//            System.out.println("Professional record created successfully.");
         } catch (SQLException e) {
             System.out.println("Exception while creating the professional account - " + e.getMessage());
         }
@@ -377,9 +377,11 @@ public class DatabaseOperations {
             preparedStatement.setTime(9, java.sql.Time.valueOf(endTime));
             preparedStatement.setDouble(10, payPerHour);
             preparedStatement.execute();
-            System.out.println("Job posting created successfully.");
+//            System.out.println("Job posting created successfully.");
         } catch (SQLException e) {
-            System.out.println("Exception while creating the job posting - " + e.getMessage());
+            System.out.println("SQL exception while creating the job posting - " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.out.println("Illegal argument exception while creating the job posting - " + e.getMessage());
         }
     }
     public void createJobQualification(Integer jobId, String company, String category, String keyword) {
@@ -418,7 +420,7 @@ public class DatabaseOperations {
             preparedStatement.setInt(2, jobId);
             preparedStatement.setString(3, company);
             preparedStatement.execute();
-            System.out.println("Job matching created successfully.");
+//            System.out.println("Job matching created successfully.");
         } catch (SQLException e) {
             System.out.println("Exception while creating the job matching - " + e.getMessage());
         }
@@ -703,7 +705,7 @@ public class DatabaseOperations {
             preparedStatement.setString(1, "inactive");
             preparedStatement.setString(2, userId);
             preparedStatement.executeUpdate();
-            System.out.println("Employer account has been deleted successfully.");
+//            System.out.println("Employer account has been deleted successfully.");
         } catch (SQLException e) {
             System.out.println("Exception while deleting the employer account - " + e.getMessage());
         }
@@ -716,7 +718,7 @@ public class DatabaseOperations {
             preparedStatement.setString(1, "inactive");
             preparedStatement.setString(2, userId);
             preparedStatement.executeUpdate();
-            System.out.println("Professional account has been deleted successfully.");
+//            System.out.println("Professional account has been deleted successfully.");
         } catch (SQLException e) {
             System.out.println("Exception while deleting the professional account - " + e.getMessage());
         }
@@ -757,7 +759,7 @@ public class DatabaseOperations {
                     // Check if the keyword matches with any of the professional qualifications
                     if (keywords_from_professional.contains(keyword_from_job)) {
                         // Create JobMatching
-                        System.out.println("Match found for jobId: " + jobId + " and company: " + company);
+//                        System.out.println("Match found for jobId: " + jobId + " and company: " + company);
                         createJobMatching(userId, jobId, company);
                         jobMatchesCount++;
                     }
@@ -806,7 +808,7 @@ public class DatabaseOperations {
             preparedStatement.setString(6, "active");
             preparedStatement.setString(7, String.valueOf(user.getUserType()));
             preparedStatement.execute();
-            System.out.println("User record created successfully.");
+//            System.out.println("User record created successfully.");
             addCredentials(user.getUserId());
         } catch (SQLException e) {
             System.out.println("Exception while creating the user account - " + e.getMessage());
@@ -825,7 +827,7 @@ public class DatabaseOperations {
             preparedStatement.setString(6, "active");
             preparedStatement.setString(7, "S");
             preparedStatement.execute();
-            System.out.println("User record created successfully.");
+//            System.out.println("User record created successfully.");
             addCredentials(user.getUserId());
         } catch (SQLException e) {
             System.out.println("Exception while creating the user account - " + e.getMessage());
@@ -989,13 +991,51 @@ public class DatabaseOperations {
                 tempJobPosting.setEndTime(resultSet.getTime("endTime").toString());
                 tempJobPosting.setPayPerHour(resultSet.getDouble("payPerHour"));
                 jobPostings.add(tempJobPosting);
-                System.out.println(tempJobPosting.getJobId());
+//                System.out.println(tempJobPosting.getJobId());
             }
         } catch (SQLException e) {
             System.out.println("Exception while retrieving job postings: " + e.getMessage());
         }
-        System.out.println(jobPostings);
+//        System.out.println(jobPostings);
         return jobPostings;
+    }
+
+    public ArrayList<Payment> getPayments(String userId){
+        ArrayList<Payment> payments = new ArrayList<Payment>();
+        try {
+            String query = "SELECT * FROM Payment WHERE userId = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                Payment tempPayment = new Payment();
+                tempPayment.setPaymentId(resultSet.getString("paymentId"));
+                tempPayment.setUserId(resultSet.getString("userId"));
+                tempPayment.setPaymentAmount(resultSet.getDouble("paymentAmount"));
+                tempPayment.setPaymentDate(resultSet.getDate("paymentDate").toString());
+                payments.add(tempPayment);
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while retrieving payments: " + e.getMessage());
+        }
+        return payments;
+    }
+
+    public String getPassword(String userId){
+        String password = "";
+        try {
+            String query = "SELECT password FROM Credentials WHERE userId = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                password = resultSet.getString("password");
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while retrieving password: " + e.getMessage());
+        }
+        return password;
     }
 
     public String getEmployerCompany(String userId) {
@@ -1012,6 +1052,21 @@ public class DatabaseOperations {
             System.out.println("Exception while retrieving employer: " + e.getMessage());
         }
         return company;
+    }
+
+    public ArrayList<String> getDeleteRequests(){
+        ArrayList<String> deleteRequests = new ArrayList<String>();
+        try {
+            String query = "SELECT userId FROM AccountDeleteRequest";
+            preparedStatement = connection.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                deleteRequests.add(resultSet.getString("userId"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while retrieving delete requests: " + e.getMessage());
+        }
+        return deleteRequests;
     }
 
     public void updateEmployerAccount(Employer employer) {
@@ -1079,6 +1134,7 @@ public class DatabaseOperations {
                 employer.setLastName(resultSet.getString("lastName"));
                 employer.setEmail(resultSet.getString("email"));
                 employer.setPhoneNumber(resultSet.getLong("phoneNumber"));
+                employer.setStatus(resultSet.getString("status"));
             }
         } catch (SQLException e) {
             System.out.println("Exception while retrieving employer details: " + e.getMessage());
@@ -1159,6 +1215,52 @@ public class DatabaseOperations {
             System.out.println("Exception while retrieving professional details: " + e.getMessage());
         }
         return professional;
+    }
+
+    public ArrayList<User> getAllUsers(){
+        ArrayList<User> users = new ArrayList<User>();
+
+        try {
+            String query = "SELECT * FROM User";
+            preparedStatement = connection.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String userId = resultSet.getString("userId");
+                String firstName = resultSet.getString("firstName");
+                String lastName = resultSet.getString("lastName");
+                String email = resultSet.getString("email");
+                long phoneNumber = resultSet.getLong("phoneNumber");
+                String status = resultSet.getString("status");
+                String userType = resultSet.getString("userType");
+
+                User tempUser = new User(userId, firstName, lastName, email, phoneNumber, status, userType.charAt(0));
+                users.add(tempUser);
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while retrieving all users: " + e.getMessage());
+        }
+        return users;
+    }
+    public ArrayList<Employer> getEmployerCreateRequests(){
+        ArrayList<Employer> employerRequests = new ArrayList<Employer>();
+
+        try {
+            String query = "SELECT userId FROM EmployerCreateRequest";
+            preparedStatement = connection.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String userId = resultSet.getString("userId");
+                // Get the Employer object with all details
+                Employer tempEmployer = getEmployerCreateRequest(userId);
+
+                employerRequests.add(tempEmployer);
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while retrieving employer create requests: " + e.getMessage());
+        }
+        return employerRequests;
 
     }
 

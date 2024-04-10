@@ -31,6 +31,15 @@ public class User {
         this.phoneNumber = phoneNumber;
         this.status = "active";
     }
+    public User(String userId, String firstName, String lastName, String email, long phoneNumber, String status, char userType) {
+        this.userId = userId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.status = status;
+        this.userType = userType;
+    }
 
     public User(String userId) {
         this.userId = userId;

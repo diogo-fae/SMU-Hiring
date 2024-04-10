@@ -4,6 +4,7 @@ import com.webappgroupg.SMUHiring.dao.DatabaseOperations;
 import com.webappgroupg.SMUHiring.model.Employer;
 import com.webappgroupg.SMUHiring.model.JobPosting;
 import com.webappgroupg.SMUHiring.model.Payment;
+import lombok.Getter;
 
 import java.util.ArrayList;
 
@@ -13,12 +14,13 @@ public class EmployerOperations {
 
     // Constructors
     public EmployerOperations(String userId) {
-        this.employerUser = new Employer(userId);
+        Employer tempEmployer = dbOps.getEmployerDetails(userId);
+        this.employerUser = new Employer(tempEmployer);
     }
-    public EmployerOperations(String userId, String firstName, String lastName, String email, int phoneNumber, String status, String address1, String address2, String city, String state, int zipCode, String company) {
+    public EmployerOperations(String userId, String firstName, String lastName, String email, long phoneNumber, String status, String address1, String address2, String city, String state, int zipCode, String company) {
         this.employerUser = new Employer(userId, firstName, lastName, email, phoneNumber, status, address1, address2, city, state, zipCode, company);
     }
-    public EmployerOperations(String userId, String firstName, String lastName, String email, int phoneNumber, String status, String address1, String city, String state, int zipCode, String company) {
+    public EmployerOperations(String userId, String firstName, String lastName, String email, long phoneNumber, String status, String address1, String city, String state, int zipCode, String company) {
         this.employerUser = new Employer(userId, firstName, lastName, email, phoneNumber, status, address1, city, state, zipCode, company);
     }
     public void closeConnection(){
@@ -53,6 +55,9 @@ public class EmployerOperations {
         Payment payment = new Payment(employerUser.getUserId(), paymentId, paymentAmount, paymentDate, dueDate);
         dbOps.makePayment(payment);
     }
+    public ArrayList<Payment> seePayments(){
+        return dbOps.getPayments(employerUser.getUserId());
+    }
 
     // Job Postings
     public void createJobPosting(int jobId, String positionName, String supervisorName, String supervisorEmail, String startDate, String endDate, String startTime, String endTime, double payPerHour) {
@@ -81,7 +86,7 @@ public class EmployerOperations {
     }
 
     // Edit account
-    public void editAccount(String firstName, String lastName, String email, int phoneNumber, String status, String address1, String address2, String city, String state, int zipCode, String company) {
+    public void editAccount(String firstName, String lastName, String email, long phoneNumber, String status, String address1, String address2, String city, String state, int zipCode, String company) {
         this.employerUser.setFirstName(firstName);
         this.employerUser.setLastName(lastName);
         this.employerUser.setEmail(email);
@@ -97,6 +102,19 @@ public class EmployerOperations {
     }
     public void changePassword(String newPassword) {
         dbOps.changePassword(employerUser.getUserId(), newPassword);
+    }
+    public String getPassword(){
+        return dbOps.getPassword(employerUser.getUserId());
+    }
+
+    public Employer getEmployerUser() {
+        return employerUser;
+    }
+
+    @Override
+    public String toString(){
+        // Print id, address1, address2, and zipCode
+        return "Employer{" + "userId='" + employerUser.getUserId() + "' address1=" + employerUser.getAddress1() + " address2=" + employerUser.getAddress2() + " zipCode=" + employerUser.getZipCode() + "}";
     }
 
     public static void main(String[] args) {

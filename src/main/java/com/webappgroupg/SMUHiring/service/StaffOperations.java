@@ -22,27 +22,33 @@ public class StaffOperations {
 
 
     // Review AccountDeleteRequests
+    public ArrayList<String> getDeleteRequests() {
+        return dbOps.getDeleteRequests();
+    }
     public void reviewDeleteRequest(String requesterUserId, String decision) {
         // Check if user is an employer or professional
         Character userType = dbOps.getUserType(requesterUserId);
 
-        if (userType == 'E') {
-            // If the request is approved, delete the employer
-            if (decision.equals("approve")) {
-                dbOps.deleteEmployerFromRequest(requesterUserId);
+        try {
+            if (userType == 'E') {
+                // If the request is approved, delete the employer
+                if (decision.equals("approve")) {
+                    dbOps.deleteEmployerFromRequest(requesterUserId);
+                }
+                // Regardless of decision, delete the request
+                dbOps.removeDeleteRequest(requesterUserId);
+            } else if (userType == 'P') {
+                // If the request is approved, delete the professional
+                if (decision.equals("approve")) {
+                    dbOps.deleteProfessionalFromRequest(requesterUserId);
+                }
+                // Regardless of decision, delete the request
+                dbOps.removeDeleteRequest(requesterUserId);
+            } else {
+                System.out.println("Invalid user type. Must be Professional or Employer.");
             }
-            // Regardless of decision, delete the request
-            dbOps.removeDeleteRequest(requesterUserId);
-        } else if (userType == 'P') {
-            // If the request is approved, delete the professional
-            if (decision.equals("approve")) {
-                dbOps.deleteProfessionalFromRequest(requesterUserId);
-            }
-            // Regardless of decision, delete the request
-            dbOps.removeDeleteRequest(requesterUserId);
-        }
-        else {
-            System.out.println("Invalid user type. Must be Professional or Employer.");
+        } catch (NullPointerException e) {
+            System.out.println("User not found.");
         }
     }
 
@@ -100,6 +106,17 @@ public class StaffOperations {
     }
     public ArrayList<Professional> viewProfessionals() {
         return dbOps.getProfessionals();
+    }
+    public ArrayList<Employer> viewEmployerRequests() {
+        return dbOps.getEmployerCreateRequests();
+    }
+
+    public Staff getStaff() {
+        return staffUser;
+    }
+
+    public String getPassword(){
+        return dbOps.getPassword(staffUser.getUserId());
     }
 
 

@@ -50,13 +50,24 @@ public class Employer {
         this.company = company;
     }
 
-    public Employer(String userId) {
-        this.userId = userId;
+    public Employer(String userId) {this.userId = userId;}
+    public Employer(Employer givenEmployer){
+        this.userId = givenEmployer.getUserId();
+        this.firstName = givenEmployer.getFirstName();
+        this.lastName = givenEmployer.getLastName();
+        this.email = givenEmployer.getEmail();
+        this.phoneNumber = givenEmployer.getPhoneNumber();
+        this.status = givenEmployer.getStatus();
+        this.address1 = givenEmployer.getAddress1();
+        this.address2 = givenEmployer.getAddress2();
+        this.city = givenEmployer.getCity();
+        this.state = givenEmployer.getState();
+        this.zipCode = givenEmployer.getZipCode();
+        this.company = givenEmployer.getCompany();
     }
 
     @Override
     public String toString() {
-        return "Employer{" +
-                "userId='" + userId + '}';
+        return "Employer{" + "userId='" + userId + "'}";
     }
 }
