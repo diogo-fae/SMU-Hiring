@@ -62,9 +62,27 @@ public class Professional {
         this.userId = userId;
     }
 
+    public Professional() {
+
+    }
+
     @Override
     public String toString() {
         return "Professional{" +
-                "userId='" + userId + '}';
+                "userId='" + userId + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", phoneNumber=" + phoneNumber +
+                ", status='" + status + '\'' +
+                ", address1='" + address1 + '\'' +
+                ", address2='" + address2 + '\'' +
+                ", city='" + city + '\'' +
+                ", state='" + state + '\'' +
+                ", zipCode=" + zipCode +
+                ", university='" + university + '\'' +
+                ", graduationDate='" + graduationDate + '\'' +
+                ", degreeType='" + degreeType + '\'' +
+                '}';
     }
 }

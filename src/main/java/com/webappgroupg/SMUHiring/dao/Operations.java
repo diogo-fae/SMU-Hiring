@@ -1,70 +1,42 @@
 package com.webappgroupg.SMUHiring.dao;
 
-import com.webappgroupg.SMUHiring.model.*;
+import com.webappgroupg.SMUHiring.model1.*;
 
-import java.sql.*;
-import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.*;
 
-public class DatabaseOperations {
-    private Connection connection = null;
-    private PreparedStatement preparedStatement;
-    private ResultSet resultSet;
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/smuhiringdbOps";
-    private static final String DB_USER = "sqluser";
-    private static final String DB_PASSWORD = "password";
+public class Operations {
 
-    // Constructor to establish database connection
-    public DatabaseOperations() {
-        try {
-            // Load JDBC driver and establish connection
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-//            System.out.println(connection);
-        } catch (Exception e) {
-            System.out.println("Exception while creating the connection - " + e.getMessage());
-        }
-    }
-    // close database connection
-    public void closeConnection() {
-        try {
-            if (resultSet != null) resultSet.close();
-            if (preparedStatement != null) preparedStatement.close();
-            if (connection != null) connection.close();
-            System.out.println("Connection closed successfully.");
+   /* public User login(String username, String password) {
+        User user = null;
+        StringBuilder query = new StringBuilder("SELECT * FROM User WHERE userId = ? AND password = ? LIMIT 1");
+
+        try{
+            preparedStatement = connection.prepareStatement(query.toString());
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, password);
+
+            resultSet = preparedStatement.executeQuery();
+
+            while(resultSet.next()) {
+                int rsUid = resultSet.getInt("userId");
+                String rsUserName = resultSet.getString("userName");
+                String rsFirstName = resultSet.getString("firstName");
+                String rsLastName = resultSet.getString("lastName");
+                String rsEmail = resultSet.getString("email");
+                int rsPhoneNumber = resultSet.getLong("phoneNumber");
+                String rsStatus = resultSet.getString("status");
+                String rsUserType = resultSet.getString("userType");
+
+                user = new User(rsUid, rsUserName, rsFirstName, rsLastName, rsEmail, rsPhoneNumber, rsStatus, rsUserType);
+            }
         } catch (SQLException e) {
-            System.out.println("SQLException while closing the connection - " + e.getMessage());
+            System.out.println("Exception while logging in - " + e.getMessage());
         }
+        return user;
     }
-
-//    public User login(String username, String password) {
-//        User user = null;
-//        StringBuilder query = new StringBuilder("SELECT * FROM User WHERE userId = ? AND password = ? LIMIT 1");
-//
-//        try{
-//            preparedStatement = connection.prepareStatement(query.toString());
-//            preparedStatement.setString(1, username);
-//            preparedStatement.setString(2, password);
-//
-//            resultSet = preparedStatement.executeQuery();
-//
-//            while(resultSet.next()) {
-//                int rsUid = resultSet.getInt("userId");
-//                String rsUserName = resultSet.getString("userName");
-//                String rsFirstName = resultSet.getString("firstName");
-//                String rsLastName = resultSet.getString("lastName");
-//                String rsEmail = resultSet.getString("email");
-//                int rsPhoneNumber = resultSet.getLong("phoneNumber");
-//                String rsStatus = resultSet.getString("status");
-//                String rsUserType = resultSet.getString("userType");
-//
-//                user = new User(rsUid, rsUserName, rsFirstName, rsLastName, rsEmail, rsPhoneNumber, rsStatus, rsUserType);
-//            }
-//        } catch (SQLException e) {
-//            System.out.println("Exception while logging in - " + e.getMessage());
-//        }
-//        return user;
-//    }
 
     public void removeDeleteRequest(String userId) {
         try {
@@ -72,14 +44,11 @@ public class DatabaseOperations {
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, userId);
             preparedStatement.executeUpdate();
-//            System.out.println("Delete request has been removed successfully.");
+            System.out.println("Delete request has been removed successfully.");
         } catch (SQLException e) {
             System.out.println("Exception while removing the delete request - " + e.getMessage());
         }
     }
-
-
-
 
     // Create accounts
     public void makePayment(String userId, String paymentId, double paymentAmount, String dueDate, String paymentDate) {
@@ -947,27 +916,7 @@ public class DatabaseOperations {
         return staffUser;
     }
 
-    public void requestNewEmployerAccount(Employer employer) {
-        try {
-            String query = "INSERT INTO EmployerCreateRequest (userId, firstName, lastName, email, phoneNumber, address1, address2, city, state, zipCode, company) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, employer.getUserId());
-            preparedStatement.setString(2, employer.getFirstName());
-            preparedStatement.setString(3, employer.getLastName());
-            preparedStatement.setString(4, employer.getEmail());
-            preparedStatement.setLong(5, employer.getPhoneNumber());
-            preparedStatement.setString(6, employer.getAddress1());
-            preparedStatement.setString(7, employer.getAddress2());
-            preparedStatement.setString(8, employer.getCity());
-            preparedStatement.setString(9, employer.getState());
-            preparedStatement.setInt(10, employer.getZipCode());
-            preparedStatement.setString(11, employer.getCompany());
-            preparedStatement.execute();
-            System.out.println("Employer request created successfully.");
-        } catch (SQLException e) {
-            System.out.println("Exception while creating the employer request - " + e.getMessage());
-        }
-    }
+
 
     public ArrayList<JobPosting> getJobPostings(String company) {
         ArrayList<JobPosting> jobPostings = new ArrayList<JobPosting>();
@@ -1262,12 +1211,7 @@ public class DatabaseOperations {
         }
         return employerRequests;
 
-    }
+    }*/
 
-//    public static void main(String[] args) {
-//        DatabaseOperations dbOps = new DatabaseOperations();
-//
-//        // Close the connection after use.
-//        dbOps.closeConnection();
-//    }
+    //Sujana
 }
