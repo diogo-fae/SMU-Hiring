@@ -1,15 +1,14 @@
 package com.webappgroupg.SMUHiring.service;
 
-import com.webappgroupg.SMUHiring.dao.DatabaseOperations;
+import com.webappgroupg.SMUHiring.dao.SmuHiringDatabaseOperations;
 import com.webappgroupg.SMUHiring.model.Employer;
 import com.webappgroupg.SMUHiring.model.JobPosting;
 import com.webappgroupg.SMUHiring.model.Payment;
-import lombok.Getter;
 
 import java.util.ArrayList;
 
 public class EmployerOperations {
-    private DatabaseOperations dbOps = new DatabaseOperations();
+   /* private SmuHiringDatabaseOperations dbOps = new SmuHiringDatabaseOperations();
     private Employer employerUser;
 
     // Constructors
@@ -134,5 +133,5 @@ public class EmployerOperations {
 //        employerOps.editAccount("updatedTest", "updatedTest", "updatedTest", 1234567890, "updatedTest", "updatedTest", "updatedTest", "TS", "TS", 12345, "updatedTest");
 //        employerOps.changePassword("testChanged");
         employerOps.closeConnection();
-    }
+    }*/
 }

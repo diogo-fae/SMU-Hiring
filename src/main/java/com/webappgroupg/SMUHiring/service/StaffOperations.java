@@ -1,12 +1,12 @@
 package com.webappgroupg.SMUHiring.service;
 
-import com.webappgroupg.SMUHiring.dao.DatabaseOperations;
+import com.webappgroupg.SMUHiring.dao.SmuHiringDatabaseOperations;
 import com.webappgroupg.SMUHiring.model.*;
 
 import java.util.ArrayList;
 
 public class StaffOperations {
-    private DatabaseOperations dbOps = new DatabaseOperations();
+   /* private SmuHiringDatabaseOperations dbOps = new SmuHiringDatabaseOperations();
     private Staff staffUser;
 
     // Constructors
@@ -134,6 +134,6 @@ public class StaffOperations {
 //        System.out.println(staffOps.viewEmployers());
 //        System.out.println(staffOps.viewProfessionals());
         staffOps.closeConnection();
-    }
+    }*/
 
 }
