@@ -8,15 +8,77 @@ import com.webappgroupg.SMUHiring.service.EmployerOperations;
 import com.webappgroupg.SMUHiring.service.RootOperations;
 import com.webappgroupg.SMUHiring.service.StaffOperations;
 
+import java.util.*;
+import javax.mail.*;
+import javax.mail.internet.*;
+import javax.activation.*;
+import javax.mail.Session;
+import javax.mail.Transport;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+
 
 public class Demo6 {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws MessagingException {
         RootOperations rootOps = new RootOperations();
         StaffOperations staffOps = new StaffOperations("demoStaff");
         EmployerOperations newEmployerOps = new EmployerOperations("demoEmployer");
         EmployerOperations existingEmployerOps = new EmployerOperations("emp9");
+
+
+        // Sending email
+        final String username = "smu.hiring.app@gmail.com";
+        final String password = "fupavceiljeibozr";
+
+        Properties prop = new Properties();
+        prop.put("mail.smtp.auth", true);
+        prop.put("mail.smtp.starttls.enable", "true");
+        prop.put("mail.smtp.host", "smtp.gmail.com");
+        prop.put("mail.smtp.port", 587);
+        prop.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+
+        Session session = Session.getInstance(prop, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
+
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(username));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse("diogo.fae2001@gmail.com"));
+        message.setSubject("Test");
+
+        MimeBodyPart mimeBodyPart = new MimeBodyPart();
+        mimeBodyPart.setContent("Hello World!!", "text/html; charset=utf-8");
+
+        Multipart multipart = new MimeMultipart();
+        multipart.addBodyPart(mimeBodyPart);
+
+        message.setContent(multipart);
+
+        Transport.send(message);
+
+
+
+//        Email email = EmailBuilder.startingBlank()
+//                .from("From", username)
+//                .to("1 st Receiver", "diogo.fae2001@gmail.com")
+//                .to("2 nd Receiver", "drodrigues@smu.edu")
+//                .withSubject("Email Subject")
+//                .withPlainText("Email Body")
+//                .buildEmail();
+//
+//        Mailer mailer = MailerBuilder
+//                .withSMTPServer("smtp.mailtrap.io", 2525, username, password)
+//                .withTransportStrategy(TransportStrategy.SMTPS)
+//                .buildMailer();
+//
+//        mailer.sendMail(email);
+
+
 
         // 1. New professional registers with the agency. Request is saved and can be viewed by staff. Show no username can repeat.
 
