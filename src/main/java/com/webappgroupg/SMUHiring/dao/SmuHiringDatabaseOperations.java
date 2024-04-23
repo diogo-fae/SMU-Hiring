@@ -263,9 +263,44 @@ public class SmuHiringDatabaseOperations {
                 jobPosting.setJobQualificationsList(getJobQualifications(jobId, company));
             }
         } catch (SQLException e) {
-            System.out.println("Exception while retrieving job postings: " + e.getMessage());
+            System.out.println("Exception while retrieving job posting Info: " + e.getMessage());
         }
         return jobPosting;
+    }
+
+    public Employer updateEmployer(Employer request) {
+        Employer employer = new Employer();
+        try {
+            employer = getEmployerInfo(request.getUserId());
+            if (StringUtils.isNotEmpty(employer.getFirstName())) {
+                String query = "UPDATE Employer SET address1 = ?, address2 = ?, city = ?, state = ?, zipCode = ?, company = ? WHERE userId = ?";
+                preparedStatement = connection.prepareStatement(query);
+                preparedStatement.setString(1, request.getAddress1());
+                preparedStatement.setString(2, request.getAddress2());
+                preparedStatement.setString(3, request.getCity());
+                preparedStatement.setString(4, request.getState());
+                preparedStatement.setInt(5, request.getZipCode());
+                preparedStatement.setString(6, request.getCompany());
+                preparedStatement.setString(7, request.getUserId());
+                preparedStatement.executeUpdate();
+                System.out.println("Employer record has been updated successfully.");
+
+                query = "UPDATE User SET firstName = ?, lastName = ?, email = ?, phoneNumber = ? WHERE userId = ?";
+                preparedStatement = connection.prepareStatement(query);
+                preparedStatement.setString(1, request.getFirstName());
+                preparedStatement.setString(2, request.getLastName());
+                preparedStatement.setString(3, request.getEmail());
+                preparedStatement.setLong(4, request.getPhoneNumber());
+                preparedStatement.setString(5, request.getUserId());
+                preparedStatement.executeUpdate();
+                System.out.println("User record has been updated successfully.");
+            } else {
+                System.out.println("Employer does not exist");
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while updating the employer account - " + e.getMessage());
+        }
+        return employer;
     }
 
 
@@ -549,9 +584,8 @@ public class SmuHiringDatabaseOperations {
     }
 
     public void postJob(JobPosting request) {
-
         try {
-            String query = "INSERT INTO JobPosting (jobId, company, positionName, supervisorFirstName, supervisorLastName, supervisorEmail, supervisorPhoneNumber, startDate, endDate, startTime, endTime, payPerHour) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String query = "INSERT INTO JobPosting (jobId, company, positionName, supervisorFirstName, supervisorLastName, supervisorEmail, supervisorPhoneNumber, startDate, endDate, startTime, endTime, payPerHour) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, request.getJobId());
             preparedStatement.setString(2, request.getCompany());
@@ -573,9 +607,15 @@ public class SmuHiringDatabaseOperations {
                     for (String keyword : professionalQualificationRequest.getValue()){
                         query = "INSERT INTO JobQualification (jobId, company, category, keyword) VALUES (?, ?, ?, ?)";
                         preparedStatement = connection.prepareStatement(query);
+                        System.out.print("Job ID: " + request.getJobId() + " ");
                         preparedStatement.setInt(1, request.getJobId());
-                        preparedStatement.setString(2, category);
-                        preparedStatement.setString(3, keyword);
+                        System.out.print("Company: " + request.getCompany() + " ");
+                        preparedStatement.setString(2, request.getCompany());
+                        System.out.print("Category: " + category + " ");
+                        preparedStatement.setString(3, category);
+                        System.out.print("Keyword: " + keyword + " ");
+                        preparedStatement.setString(4, keyword);
+                        System.out.println("EXECUTE");
                         preparedStatement.execute();
                     }
                 }
@@ -620,18 +660,18 @@ public class SmuHiringDatabaseOperations {
          try {
             String query = "UPDATE JobPosting SET positionName = ?, supervisorFirstName = ?, supervisorLastName = ?, supervisorEmail = ?, supervisorPhoneNumber = ?, startDate = ?, endDate = ?, startTime = ?, endTime = ?, payPerHour = ? WHERE jobId = ? AND company = ?";
             preparedStatement = connection.prepareStatement(query);
-             preparedStatement.setInt(1, request.getJobId());
-             preparedStatement.setString(2, request.getCompany());
-             preparedStatement.setString(3, request.getPositionName());
-             preparedStatement.setString(4, request.getSupervisorFirstName());
-             preparedStatement.setString(5, request.getSupervisorLastName());
-             preparedStatement.setString(6, request.getSupervisorEmail());
-             preparedStatement.setLong(7, request.getSupervisorPhoneNumber());
-             preparedStatement.setDate(8, java.sql.Date.valueOf(request.getStartDate()));
-             preparedStatement.setDate(9, java.sql.Date.valueOf(request.getEndDate()));
-             preparedStatement.setTime(10, java.sql.Time.valueOf(request.getStartTime()));
-             preparedStatement.setTime(11, java.sql.Time.valueOf(request.getEndTime()));
-             preparedStatement.setDouble(12, request.getPayPerHour());
+            preparedStatement.setString(1, request.getPositionName());
+            preparedStatement.setString(2, request.getSupervisorFirstName());
+            preparedStatement.setString(3, request.getSupervisorLastName());
+            preparedStatement.setString(4, request.getSupervisorEmail());
+            preparedStatement.setLong(5, request.getSupervisorPhoneNumber());
+            preparedStatement.setDate(6, java.sql.Date.valueOf(request.getStartDate()));
+            preparedStatement.setDate(7, java.sql.Date.valueOf(request.getEndDate()));
+            preparedStatement.setTime(8, java.sql.Time.valueOf(request.getStartTime()));
+            preparedStatement.setTime(9, java.sql.Time.valueOf(request.getEndTime()));
+            preparedStatement.setDouble(10, request.getPayPerHour());
+            preparedStatement.setInt(11, request.getJobId());
+            preparedStatement.setString(12, request.getCompany());
             preparedStatement.executeUpdate();
 
             if(!CollectionUtils.isEmpty(request.getJobQualificationsList())) {
@@ -663,24 +703,11 @@ public class SmuHiringDatabaseOperations {
     return request;
     }
 
-    public void requestProfessionalDelete(String userId) {
+    public void requestUserDelete(String userId) {
         try {
             String query = "INSERT INTO AccountDeleteRequest (userId) VALUES (?)";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, userId);
-            preparedStatement.execute();
-            System.out.println("Professional account deletion request has been sent successfully for user: " + userId);
-        } catch (SQLException e) {
-            System.out.println("Exception while sending the professional account deletion request - " + e.getMessage());
-        }
-    }
-
-    public void requestUserDelete(String userId) {
-        try {
-            String query = "UPDATE User SET status = ? WHERE userId = ?";
-            preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, "inactive");
-            preparedStatement.setString(2, userId);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Exception while inactivating user account - " + e.getMessage());
@@ -743,7 +770,37 @@ public class SmuHiringDatabaseOperations {
                 jobPostings.add(jobPosting);
             }
         } catch (SQLException e) {
-            System.out.println("Exception while retrieving job postings: " + e.getMessage());
+            System.out.println("Exception while retrieving all job postings: " + e.getMessage());
+        }
+        return jobPostings;
+
+    }
+
+    public List<JobPosting> getAllJobs(String company) {
+        ArrayList<JobPosting> jobPostings = new ArrayList<JobPosting>();
+        try {
+            String query = "SELECT * FROM JobPosting WHERE company = ?"; // Do we need company here or is it a general search
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, company);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                JobPosting jobPosting = new JobPosting();
+                jobPosting.setJobId(resultSet.getInt("jobId"));
+                jobPosting.setCompany(resultSet.getString("company"));
+                jobPosting.setPositionName(resultSet.getString("positionName"));
+                jobPosting.setSupervisorFirstName(resultSet.getString("supervisorFirstName"));
+                jobPosting.setSupervisorLastName(resultSet.getString("supervisorLastName"));
+                jobPosting.setSupervisorEmail(resultSet.getString("supervisorEmail"));
+                jobPosting.setSupervisorPhoneNumber(resultSet.getLong("supervisorPhoneNumber"));
+                jobPosting.setStartDate(resultSet.getDate("startDate").toString());
+                jobPosting.setEndDate(resultSet.getDate("endDate").toString());
+                jobPosting.setStartTime(resultSet.getTime("startTime").toString());
+                jobPosting.setEndTime(resultSet.getTime("endTime").toString());
+                jobPosting.setPayPerHour(resultSet.getDouble("payPerHour"));
+                jobPostings.add(jobPosting);
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while retrieving job postings for company: " + e.getMessage());
         }
         return jobPostings;
 

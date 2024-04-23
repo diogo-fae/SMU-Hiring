@@ -62,13 +62,14 @@ public class SmuHiringController {
 
     @GetMapping(value = "/getJobInfo", produces = MediaType.APPLICATION_JSON_VALUE)
     public JobPosting getJobInfo(@RequestParam("jobId") int jobId, @RequestParam("company") String company) {
-        System.out.println("Received user id: " + jobId + " and company: " + company);
+//        System.out.println("Received user id: " + jobId + " and company: " + company);
         // Assuming smuHiringService.getJobInfo(jobId, company) retrieves job information based on jobId and company
         return smuHiringService.getJobInfo(jobId, company);
     }
 
     @PostMapping(value = "/updateEmployer", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Employer updateEmployer(@RequestBody Employer request){
+        System.out.println("Received user id: " + request.getUserId());
         return smuHiringService.updateEmployer(request);
     }
 
@@ -77,9 +78,14 @@ public class SmuHiringController {
         return smuHiringService.getAllJobs(); // Do we need job qualifications as well to be displayed here?
     }
 
+    @GetMapping(value = "/getAllJobs/{company}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<JobPosting> getAllJobs(@PathVariable("company") String company) {
+        return smuHiringService.getAllJobs(company); // Do we need job qualifications as well to be displayed here?
+    }
+
     @PostMapping(value = "/requestProfessionalDelete/{userId}")
     public void requestProfessionalDelete(@PathVariable("userId") String userId){
-        smuHiringService.requestProfessionalDelete(userId);
+        smuHiringService.requestUserDelete(userId);
     }
 
     @GetMapping(value = "/getProfessionalInfo/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -99,7 +105,7 @@ public class SmuHiringController {
 
     @PostMapping(value = "/requestJobMatching/{userId}")
     public void initiateJobMatching(@PathVariable("userId") String userId){
-        System.out.println("Received user id: " + userId);
+//        System.out.println("Received user id: " + userId);
         smuHiringService.initiateJobMatching(userId);
     }
 

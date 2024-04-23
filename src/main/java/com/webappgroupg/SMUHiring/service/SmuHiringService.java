@@ -37,7 +37,7 @@ public class SmuHiringService {
     }
 
     public Employer updateEmployer(Employer request) {
-        return new Employer();
+        return smuHiringDatabaseOperations.updateEmployer(request);
     }
 
     public void initiateJobMatching(String userId) {
@@ -87,9 +87,6 @@ public class SmuHiringService {
         return smuHiringDatabaseOperations.updateJob(request);
     }
 
-    public void requestProfessionalDelete(String userId) {
-        smuHiringDatabaseOperations.requestProfessionalDelete(userId);
-    }
     public void requestUserDelete(String userId) {
         smuHiringDatabaseOperations.requestUserDelete(userId);
     }
@@ -100,6 +97,10 @@ public class SmuHiringService {
 
     public List<JobPosting> getAllJobs() {
         return smuHiringDatabaseOperations.getAllJobs();
+    }
+
+    public List<JobPosting> getAllJobs(String company) {
+        return smuHiringDatabaseOperations.getAllJobs(company);
     }
 
     public Professional getProfessionalInfo(String userId) {
