@@ -13,6 +13,8 @@ import java.util.Map;
 public class JobQualifications {
     private int jobId;
     private String company;
+    private String category;
+    private String keyword;
     // Dictionary with category as key and list of qualifications as value
     private Map<String, List<String>> qualifications;
 

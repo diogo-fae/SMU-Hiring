@@ -6,6 +6,8 @@ import com.webappgroupg.SMUHiring.model1.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class SmuHiringService {
 
@@ -38,7 +40,10 @@ public class SmuHiringService {
     }
 
     public void postJob(JobPosting request) {
+        smuHiringDatabaseOperations.postJob(request);
     }
+
+
 
     public Payment makePayment(Payment payment) {
         return smuHiringDatabaseOperations.makePayment(payment);
@@ -67,5 +72,29 @@ public class SmuHiringService {
     }
 
     public void createStaff(User request) {
+    }
+
+    public void deleteJob(JobPosting request) {
+        smuHiringDatabaseOperations.deleteJob(request);
+    }
+
+    public JobPosting updateJob(JobPosting request) {
+        return smuHiringDatabaseOperations.updateJob(request);
+    }
+
+    public void requestUserDelete(String userId) {
+        smuHiringDatabaseOperations.requestUserDelete(userId);
+    }
+
+    public Employer getEmployerInfo(String userId) {
+        return smuHiringDatabaseOperations.getEmployerInfo(userId);
+    }
+
+    public List<JobPosting> getAllJobs() {
+        return smuHiringDatabaseOperations.getAllJobs();
+    }
+
+    public Professional getProfessionalInfo(String userId) {
+        return smuHiringDatabaseOperations.getProfessionalInfo(userId);
     }
 }
