@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Map;
 
 
 @Getter
@@ -25,6 +26,6 @@ public class ProfessionalRequest {
     private String university;
     private String graduationDate;
     private String degreeType;
-    private List<ProfessionalQualificationRequest> professionalQualificationRequest;
+    private Map<String, List<String>> professionalQualificationRequest;
 
 }

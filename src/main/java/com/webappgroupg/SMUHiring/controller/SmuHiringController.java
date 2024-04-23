@@ -60,9 +60,11 @@ public class SmuHiringController {
         return smuHiringService.getEmployerInfo(userId);
     }
 
-    @GetMapping(value = "/getJobInfo/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public void getJobInfo(@PathVariable("userId") String userId) {
-        //return smuHiringService.getJobInfo(userId); //Need to check if this is needed for employer
+    @GetMapping(value = "/getJobInfo", produces = MediaType.APPLICATION_JSON_VALUE)
+    public JobPosting getJobInfo(@RequestParam("jobId") int jobId, @RequestParam("company") String company) {
+        System.out.println("Received user id: " + jobId + " and company: " + company);
+        // Assuming smuHiringService.getJobInfo(jobId, company) retrieves job information based on jobId and company
+        return smuHiringService.getJobInfo(jobId, company);
     }
 
     @PostMapping(value = "/updateEmployer", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -75,9 +77,9 @@ public class SmuHiringController {
         return smuHiringService.getAllJobs(); // Do we need job qualifications as well to be displayed here?
     }
 
-    @PostMapping(value = "/requestProfessionalDelete/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/requestProfessionalDelete/{userId}")
     public void requestProfessionalDelete(@PathVariable("userId") String userId){
-        smuHiringService.requestUserDelete(userId);
+        smuHiringService.requestProfessionalDelete(userId);
     }
 
     @GetMapping(value = "/getProfessionalInfo/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -95,9 +97,9 @@ public class SmuHiringController {
     //getJobInfo
     //requestJobMatching
 
-
-    @PostMapping(value = "/requestJobMatching/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/requestJobMatching/{userId}")
     public void initiateJobMatching(@PathVariable("userId") String userId){
+        System.out.println("Received user id: " + userId);
         smuHiringService.initiateJobMatching(userId);
     }
 

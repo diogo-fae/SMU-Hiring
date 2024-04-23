@@ -20,6 +20,7 @@ public class SmuHiringDatabaseOperations {
     private ResultSet resultSet;
     private static final String DB_URL = "jdbc:mysql://localhost:3306/smu_hiring";
     private static final String DB_USER = "root";
+//    private static final String DB_USER = "smu_user";
     private static final String DB_PASSWORD = "password";
 
     // Constructor to establish database connection
@@ -76,15 +77,18 @@ public class SmuHiringDatabaseOperations {
         }
     }
 
-    public void registerProfessionalQualificationRequest(List<ProfessionalQualificationRequest> professionalQualificationRequests) {
+    public void registerProfessionalQualificationRequest(String userId, Map<String, List<String>> professionalQualificationRequests) {
         try {
-            for (ProfessionalQualificationRequest professionalQualificationRequest : professionalQualificationRequests) {
-                String query = "INSERT INTO ProfessionalQualificationRequest (userId, category, keyword) VALUES (?, ?, ?)";
-                preparedStatement = connection.prepareStatement(query);
-                preparedStatement.setString(1, professionalQualificationRequest.getUserId());
-                preparedStatement.setString(2, professionalQualificationRequest.getCategory());
-                preparedStatement.setString(3, professionalQualificationRequest.getKeyword());
-                preparedStatement.execute();
+            for (Map.Entry<String, List<String>> professionalQualificationRequest : professionalQualificationRequests.entrySet()) {
+                String category = professionalQualificationRequest.getKey();
+                for (String keyword : professionalQualificationRequest.getValue()){
+                    String query = "INSERT INTO ProfessionalQualificationRequest (userId, category, keyword) VALUES (?, ?, ?)";
+                    preparedStatement = connection.prepareStatement(query);
+                    preparedStatement.setString(1, userId);
+                    preparedStatement.setString(2, category);
+                    preparedStatement.setString(3, keyword);
+                    preparedStatement.execute();
+                }
             }
             System.out.println("Professional record created successfully.");
         } catch (SQLException e) {
@@ -160,6 +164,7 @@ public class SmuHiringDatabaseOperations {
             preparedStatement.setString(1, userId);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
+                professional.setUserId(resultSet.getString("userId"));
                 professional.setFirstName(resultSet.getString("firstName"));
                 professional.setLastName(resultSet.getString("lastName"));
                 professional.setEmail(resultSet.getString("email"));
@@ -179,11 +184,90 @@ public class SmuHiringDatabaseOperations {
                 professional.setGraduationDate(resultSet.getString("graduationDate"));
                 professional.setDegreeType(resultSet.getString("degreeType"));
             }
+            Map<String, List<String>> qualifications = getProfessionalQualifications(userId);
+            professional.setProfessionalQualificationsList(qualifications);
         } catch (SQLException e) {
             System.out.println("Exception while retrieving professional details: " + e.getMessage());
         }
         return professional;
     }
+
+    public Map<String, List<String>> getProfessionalQualifications(String userId) {
+        Map<String, List<String>> qualifications = new HashMap<>();
+        try {
+            String query = "SELECT * FROM ProfessionalQualification WHERE userId = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                String category = resultSet.getString("category");
+                String keyword = resultSet.getString("keyword");
+                if (qualifications.containsKey(category)) {
+                    qualifications.get(category).add(keyword);
+                } else {
+                    qualifications.put(category, new ArrayList<String>());
+                    qualifications.get(category).add(keyword);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while retrieving professional qualifications: " + e.getMessage());
+        }
+        return qualifications;
+    }
+
+    public Map<String, List<String>> getJobQualifications(int userId, String company) {
+        Map<String, List<String>> qualifications = new HashMap<>();
+        try {
+            String query = "SELECT * FROM JobQualification WHERE jobId = ? AND company = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, userId);
+            preparedStatement.setString(2, company);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                String category = resultSet.getString("category");
+                String keyword = resultSet.getString("keyword");
+                if (qualifications.containsKey(category)) {
+                    qualifications.get(category).add(keyword);
+                } else {
+                    qualifications.put(category, new ArrayList<String>());
+                    qualifications.get(category).add(keyword);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while retrieving job qualifications: " + e.getMessage());
+        }
+        return qualifications;
+    }
+
+    public JobPosting getJobInfo(int jobId, String company) {
+        JobPosting jobPosting = new JobPosting();
+        try {
+            String query = "SELECT * FROM JobPosting WHERE jobId = ? AND company = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, jobId);
+            preparedStatement.setString(2, company);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                jobPosting.setJobId(resultSet.getInt("jobId"));
+                jobPosting.setCompany(resultSet.getString("company"));
+                jobPosting.setPositionName(resultSet.getString("positionName"));
+                jobPosting.setSupervisorFirstName(resultSet.getString("supervisorFirstName"));
+                jobPosting.setSupervisorLastName(resultSet.getString("supervisorLastName"));
+                jobPosting.setSupervisorEmail(resultSet.getString("supervisorEmail"));
+                jobPosting.setSupervisorPhoneNumber(resultSet.getLong("supervisorPhoneNumber"));
+                jobPosting.setStartDate(resultSet.getDate("startDate").toString());
+                jobPosting.setEndDate(resultSet.getDate("endDate").toString());
+                jobPosting.setStartTime(resultSet.getTime("startTime").toString());
+                jobPosting.setEndTime(resultSet.getTime("endTime").toString());
+                jobPosting.setPayPerHour(resultSet.getDouble("payPerHour"));
+                jobPosting.setJobQualificationsList(getJobQualifications(jobId, company));
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while retrieving job postings: " + e.getMessage());
+        }
+        return jobPosting;
+    }
+
 
     public Professional updateProfessional(Professional request) {
         Professional professional = new Professional();
@@ -213,6 +297,8 @@ public class SmuHiringDatabaseOperations {
                 preparedStatement.setString(5, request.getUserId());
                 preparedStatement.executeUpdate();
                 System.out.println("User record has been updated successfully.");
+
+                updateProfessionalQualifications(request.getUserId(), request.getProfessionalQualificationsList());
             } else {
                 System.out.println("Professional does not exist");
             }
@@ -220,6 +306,33 @@ public class SmuHiringDatabaseOperations {
             System.out.println("Exception while updating the employer account - " + e.getMessage());
         }
         return professional;
+    }
+
+    public void updateProfessionalQualifications(String userId, Map<String, List<String>> qualifications) {
+        try {
+            for (Map.Entry<String, List<String>> entry : qualifications.entrySet()) {
+                String category = entry.getKey();
+                // Delete all qualifications from category
+                String query1 = "DELETE FROM ProfessionalQualification WHERE userId = ? AND category = ?";
+                preparedStatement = connection.prepareStatement(query1);
+                preparedStatement.setString(1, userId);
+                preparedStatement.setString(2, category);
+                preparedStatement.executeUpdate();
+                // Now add all new qualifications passed
+                List<String> keywords = entry.getValue();
+                for (String keyword : keywords) {
+                    String query2 = "INSERT INTO ProfessionalQualification (userId, category, keyword) VALUES (?, ?, ?)";
+                    preparedStatement = connection.prepareStatement(query2);
+                    preparedStatement.setString(1, userId);
+                    preparedStatement.setString(2, category);
+                    preparedStatement.setString(3, keyword);
+                    preparedStatement.execute();
+                }
+            }
+            System.out.println("Professional qualifications updated successfully.");
+        } catch (SQLException e) {
+            System.out.println("Exception while updating the professional qualifications - " + e.getMessage());
+        }
     }
 
     public void updateEmployerAccount(Employer employer) {
@@ -424,32 +537,47 @@ public class SmuHiringDatabaseOperations {
         return password;
     }
 
+    public void initiateJobMatching(String userId){
+        try {
+            String query = "INSERT INTO JobMatchingRequest (userId) VALUES (?)";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, userId);
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            System.out.println("Exception while creating job matching request - " + e.getMessage());
+        }
+    }
+
     public void postJob(JobPosting request) {
 
         try {
-            String query = "INSERT INTO JobPosting (jobId, company, positionName, supervisorName, supervisorEmail, startDate, endDate, startTime, endTime, payPerHour) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String query = "INSERT INTO JobPosting (jobId, company, positionName, supervisorFirstName, supervisorLastName, supervisorEmail, supervisorPhoneNumber, startDate, endDate, startTime, endTime, payPerHour) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, request.getJobId());
             preparedStatement.setString(2, request.getCompany());
             preparedStatement.setString(3, request.getPositionName());
-            preparedStatement.setString(4, request.getSupervisorName());
-            preparedStatement.setString(5, request.getSupervisorEmail());
-            preparedStatement.setDate(6, java.sql.Date.valueOf(request.getStartDate()));
-            preparedStatement.setDate(7, java.sql.Date.valueOf(request.getEndDate()));
-            preparedStatement.setTime(8, java.sql.Time.valueOf(request.getStartTime()));
-            preparedStatement.setTime(9, java.sql.Time.valueOf(request.getEndTime()));
-            preparedStatement.setDouble(10, request.getPayPerHour());
+            preparedStatement.setString(4, request.getSupervisorFirstName());
+            preparedStatement.setString(5, request.getSupervisorLastName());
+            preparedStatement.setString(6, request.getSupervisorEmail());
+            preparedStatement.setLong(7, request.getSupervisorPhoneNumber());
+            preparedStatement.setDate(8, java.sql.Date.valueOf(request.getStartDate()));
+            preparedStatement.setDate(9, java.sql.Date.valueOf(request.getEndDate()));
+            preparedStatement.setTime(10, java.sql.Time.valueOf(request.getStartTime()));
+            preparedStatement.setTime(11, java.sql.Time.valueOf(request.getEndTime()));
+            preparedStatement.setDouble(12, request.getPayPerHour());
             preparedStatement.execute();
 
             if(!CollectionUtils.isEmpty(request.getJobQualificationsList())) {
-                for(JobQualifications jobQualifications: request.getJobQualificationsList()) {
-                    query = "INSERT INTO JobQualification (jobId, company, category, keyword) VALUES (?, ?, ?, ?)";
-                    preparedStatement = connection.prepareStatement(query);
-                    preparedStatement.setInt(1, jobQualifications.getJobId());
-                    preparedStatement.setString(2, jobQualifications.getCompany());
-                    preparedStatement.setString(3, jobQualifications.getCategory());
-                    preparedStatement.setString(4, jobQualifications.getKeyword());
-                    preparedStatement.execute();
+                for (Map.Entry<String, List<String>> professionalQualificationRequest : request.getJobQualificationsList().entrySet()) {
+                    String category = professionalQualificationRequest.getKey();
+                    for (String keyword : professionalQualificationRequest.getValue()){
+                        query = "INSERT INTO JobQualification (jobId, company, category, keyword) VALUES (?, ?, ?, ?)";
+                        preparedStatement = connection.prepareStatement(query);
+                        preparedStatement.setInt(1, request.getJobId());
+                        preparedStatement.setString(2, category);
+                        preparedStatement.setString(3, keyword);
+                        preparedStatement.execute();
+                    }
                 }
             }
 
@@ -462,19 +590,24 @@ public class SmuHiringDatabaseOperations {
 
     public void deleteJob(JobPosting request) {
         try {
+            // Delete the job posting
             String query = "DELETE FROM JobPosting WHERE jobId = ? AND company = ?";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, request.getJobId());
             preparedStatement.setString(2, request.getCompany());
             preparedStatement.executeUpdate();
 
+            // Delete the job qualifications
             if(!CollectionUtils.isEmpty(request.getJobQualificationsList())) {
-                for (JobQualifications jobQualifications : request.getJobQualificationsList()) {
-                    query = "DELETE FROM JobQualification WHERE jobId = ? AND company = ?";
-                    preparedStatement = connection.prepareStatement(query);
-                    preparedStatement.setInt(1, jobQualifications.getJobId());
-                    preparedStatement.setString(2, jobQualifications.getCompany());
-                    preparedStatement.executeUpdate();
+                for (Map.Entry<String, List<String>> professionalQualificationRequest : request.getJobQualificationsList().entrySet()) {
+                    String category = professionalQualificationRequest.getKey();
+                    for (String keyword : professionalQualificationRequest.getValue()) {
+                        query = "DELETE FROM JobQualification WHERE jobId = ? AND company = ?";
+                        preparedStatement = connection.prepareStatement(query);
+                        preparedStatement.setInt(1, request.getJobId());
+                        preparedStatement.setString(2, request.getCompany());
+                        preparedStatement.executeUpdate();
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -485,35 +618,41 @@ public class SmuHiringDatabaseOperations {
 
     public JobPosting updateJob(JobPosting request) {
          try {
-            String query = "UPDATE JobPosting SET positionName = ?, supervisorName = ?, supervisorEmail = ?, startDate = ?, endDate = ?, startTime = ?, endTime = ?, payPerHour = ? WHERE jobId = ? AND company = ?";
+            String query = "UPDATE JobPosting SET positionName = ?, supervisorFirstName = ?, supervisorLastName = ?, supervisorEmail = ?, supervisorPhoneNumber = ?, startDate = ?, endDate = ?, startTime = ?, endTime = ?, payPerHour = ? WHERE jobId = ? AND company = ?";
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, request.getPositionName());
-            preparedStatement.setString(2, request.getSupervisorName());
-            preparedStatement.setString(3, request.getSupervisorEmail());
-            preparedStatement.setDate(4, java.sql.Date.valueOf(request.getStartDate()));
-            preparedStatement.setDate(5, java.sql.Date.valueOf(request.getEndDate()));
-            preparedStatement.setTime(6, java.sql.Time.valueOf(request.getStartTime()));
-            preparedStatement.setTime(7, java.sql.Time.valueOf(request.getEndTime()));
-            preparedStatement.setDouble(8, request.getPayPerHour());
-            preparedStatement.setInt(9, request.getJobId());
-            preparedStatement.setString(10, request.getCompany());
+             preparedStatement.setInt(1, request.getJobId());
+             preparedStatement.setString(2, request.getCompany());
+             preparedStatement.setString(3, request.getPositionName());
+             preparedStatement.setString(4, request.getSupervisorFirstName());
+             preparedStatement.setString(5, request.getSupervisorLastName());
+             preparedStatement.setString(6, request.getSupervisorEmail());
+             preparedStatement.setLong(7, request.getSupervisorPhoneNumber());
+             preparedStatement.setDate(8, java.sql.Date.valueOf(request.getStartDate()));
+             preparedStatement.setDate(9, java.sql.Date.valueOf(request.getEndDate()));
+             preparedStatement.setTime(10, java.sql.Time.valueOf(request.getStartTime()));
+             preparedStatement.setTime(11, java.sql.Time.valueOf(request.getEndTime()));
+             preparedStatement.setDouble(12, request.getPayPerHour());
             preparedStatement.executeUpdate();
 
             if(!CollectionUtils.isEmpty(request.getJobQualificationsList())) {
-                 for (JobQualifications jobQualifications : request.getJobQualificationsList()) {
-                     query = "DELETE FROM JobQualification WHERE jobId = ? AND company = ?";
-                     preparedStatement = connection.prepareStatement(query);
-                     preparedStatement.setInt(1, jobQualifications.getJobId());
-                     preparedStatement.setString(2, jobQualifications.getCompany());
-                     preparedStatement.executeUpdate();
+                // Delete all existing qualifications
+                query = "DELETE FROM JobQualification WHERE jobId = ? AND company = ?";
+                preparedStatement = connection.prepareStatement(query);
+                preparedStatement.setInt(1, request.getJobId());
+                preparedStatement.setString(2, request.getCompany());
+                preparedStatement.executeUpdate();
 
-                     query = "INSERT INTO JobQualification (jobId, company, category, keyword) VALUES (?, ?, ?, ?)";
-                     preparedStatement = connection.prepareStatement(query);
-                     preparedStatement.setInt(1, jobQualifications.getJobId());
-                     preparedStatement.setString(2, jobQualifications.getCompany());
-                     preparedStatement.setString(3, jobQualifications.getCategory());
-                     preparedStatement.setString(4, jobQualifications.getKeyword());
-                     preparedStatement.execute();
+                for (Map.Entry<String, List<String>> professionalQualificationRequest : request.getJobQualificationsList().entrySet()) {
+                    String category = professionalQualificationRequest.getKey();
+                    for (String keyword : professionalQualificationRequest.getValue()) {
+                        query = "INSERT INTO JobQualification (jobId, company, category, keyword) VALUES (?, ?, ?, ?)";
+                        preparedStatement = connection.prepareStatement(query);
+                        preparedStatement.setInt(1, request.getJobId());
+                        preparedStatement.setString(2, request.getCompany());
+                        preparedStatement.setString(3, category);
+                        preparedStatement.setString(4, keyword);
+                        preparedStatement.execute();
+                    }
                  }
             }
 
@@ -522,6 +661,18 @@ public class SmuHiringDatabaseOperations {
         }
 
     return request;
+    }
+
+    public void requestProfessionalDelete(String userId) {
+        try {
+            String query = "INSERT INTO AccountDeleteRequest (userId) VALUES (?)";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, userId);
+            preparedStatement.execute();
+            System.out.println("Professional account deletion request has been sent successfully for user: " + userId);
+        } catch (SQLException e) {
+            System.out.println("Exception while sending the professional account deletion request - " + e.getMessage());
+        }
     }
 
     public void requestUserDelete(String userId) {
@@ -544,6 +695,7 @@ public class SmuHiringDatabaseOperations {
             preparedStatement.setString(1, userId);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
+                employer.setUserId(resultSet.getString("userId"));
                 employer.setFirstName(resultSet.getString("firstName"));
                 employer.setLastName(resultSet.getString("lastName"));
                 employer.setEmail(resultSet.getString("email"));
@@ -579,8 +731,10 @@ public class SmuHiringDatabaseOperations {
                 jobPosting.setJobId(resultSet.getInt("jobId"));
                 jobPosting.setCompany(resultSet.getString("company"));
                 jobPosting.setPositionName(resultSet.getString("positionName"));
-                jobPosting.setSupervisorName(resultSet.getString("supervisorName"));
+                jobPosting.setSupervisorFirstName(resultSet.getString("supervisorFirstName"));
+                jobPosting.setSupervisorLastName(resultSet.getString("supervisorLastName"));
                 jobPosting.setSupervisorEmail(resultSet.getString("supervisorEmail"));
+                jobPosting.setSupervisorPhoneNumber(resultSet.getLong("supervisorPhoneNumber"));
                 jobPosting.setStartDate(resultSet.getDate("startDate").toString());
                 jobPosting.setEndDate(resultSet.getDate("endDate").toString());
                 jobPosting.setStartTime(resultSet.getTime("startTime").toString());

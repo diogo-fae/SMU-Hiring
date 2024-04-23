@@ -24,6 +24,7 @@ public class ProfessionalOperations {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/smu_hiring", "root", "password");
+//            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/smu_hiring", "smu_user", "password");
             System.out.println(connection);
         } catch (Exception e) {
             System.out.println("Exception while creating the connection - " + e.getMessage());

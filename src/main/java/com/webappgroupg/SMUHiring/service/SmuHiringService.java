@@ -16,7 +16,7 @@ public class SmuHiringService {
 
     public void registerProfessional(ProfessionalRequest request) {
         smuHiringDatabaseOperations.registerProfessionalAccountRequest(request);
-        smuHiringDatabaseOperations.registerProfessionalQualificationRequest(request.getProfessionalQualificationRequest());
+        smuHiringDatabaseOperations.registerProfessionalQualificationRequest(request.getUserId(), request.getProfessionalQualificationRequest());
     }
 
     public void registerEmployer(EmployerRequest request) {
@@ -32,11 +32,16 @@ public class SmuHiringService {
         return smuHiringDatabaseOperations.updateProfessional(request);
     }
 
+    public JobPosting getJobInfo(int jobId, String company) {
+        return smuHiringDatabaseOperations.getJobInfo(jobId, company);
+    }
+
     public Employer updateEmployer(Employer request) {
         return new Employer();
     }
 
     public void initiateJobMatching(String userId) {
+        smuHiringDatabaseOperations.initiateJobMatching(userId);
     }
 
     public void postJob(JobPosting request) {
@@ -82,6 +87,9 @@ public class SmuHiringService {
         return smuHiringDatabaseOperations.updateJob(request);
     }
 
+    public void requestProfessionalDelete(String userId) {
+        smuHiringDatabaseOperations.requestProfessionalDelete(userId);
+    }
     public void requestUserDelete(String userId) {
         smuHiringDatabaseOperations.requestUserDelete(userId);
     }
