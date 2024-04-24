@@ -21,7 +21,7 @@ public class SmuHiringDatabaseOperations {
     private PreparedStatement preparedStatement;
     private ResultSet resultSet;
     private static final String DB_URL = "jdbc:mysql://localhost:3306/smu_hiring";
-    private static final String DB_USER = "root";
+    private static final String DB_USER = "smu_user";
     private static final String DB_PASSWORD = "password";
 
     public SmuHiringDatabaseOperations() {
@@ -562,14 +562,41 @@ public class SmuHiringDatabaseOperations {
     }
 
     public void initiateJobMatching(String userId){
+        // Delete request
         deleteProfessionalRequest(userId);
+        // Get Job Matches
         List<String> jobIds = jobMatching(userId); // shd return a list of jobIds
+        // Send emails
         Professional professional = getProfessionalInfo(userId);
+        String supervisorEmailContent = "";
+        StringBuilder professionalEmailContent = new StringBuilder("Congratulations! You have new job matches!!<br/>" +
+                "Please review the job details below and contact the supervisor for further details.<br/>");
         for(String jobId: jobIds){
             JobPosting jobPosting = getJobInfo(jobId.split("_")[0], jobId.split("_")[1]);
-            sendEmail(professional.getEmail(), "Job Posting from " + jobId.split("_")[1], jobPosting.toString());
-            sendEmail(jobPosting.getSupervisorEmail(), "Professional Profile Details", professional.toString());
+            // Send email to the professional
+            professionalEmailContent.append("Job Match:");
+            professionalEmailContent.append("&nbsp;&nbsp;&nbsp;&nbsp;Company: ").append(jobPosting.getCompany()).append("<br/>");
+            professionalEmailContent.append("&nbsp;&nbsp;&nbsp;&nbsp;Job ID: ").append(jobPosting.getJobId()).append("<br/>");
+            professionalEmailContent.append("&nbsp;&nbsp;&nbsp;&nbsp;Position: ").append(jobPosting.getPositionName()).append("<br/>");
+            professionalEmailContent.append("&nbsp;&nbsp;&nbsp;&nbsp;Supervisor Name: ").append(jobPosting.getSupervisorFirstName()).append(" ").append(jobPosting.getSupervisorLastName()).append("<br/>");
+            professionalEmailContent.append("&nbsp;&nbsp;&nbsp;&nbsp;Supervisor Email: ").append(jobPosting.getSupervisorEmail()).append("<br/>");
+            professionalEmailContent.append("&nbsp;&nbsp;&nbsp;&nbsp;Supervisor Phone Number: ").append(jobPosting.getSupervisorPhoneNumber()).append("<br/>");
+            // Send email to the supervisor
+            supervisorEmailContent = "Congratulations!<br/>You have a new job match for the position " + jobPosting.getPositionName() + " with the Professional: " + professional.getFirstName() + " " + professional.getLastName();
+            supervisorEmailContent += ". <br/>Please review the professional profile details below and contact the professional for further details.<br/>";
+            supervisorEmailContent += "&nbsp;&nbsp;&nbsp;&nbsp;Name: " + professional.getFirstName() + " " + professional.getLastName() + "<br/>";
+            supervisorEmailContent += "&nbsp;&nbsp;&nbsp;&nbsp;Email: " + professional.getEmail() + "<br/>";
+            supervisorEmailContent += "&nbsp;&nbsp;&nbsp;&nbsp;Phone Number: " + professional.getPhoneNumber() + "<br/>";
+            System.out.println("Sending email to supervisor " + jobPosting.getPositionName());
+            if (!StringUtils.isEmpty(jobPosting.getSupervisorEmail())) {
+                sendEmail(jobPosting.getSupervisorEmail(), "Professional Profile Details", supervisorEmailContent);
+            } else{
+                System.out.println("Supervisor email is empty for job id: " + jobPosting.getJobId());
+            }
         }
+        System.out.println("Sending Professional email");
+        sendEmail(professional.getEmail(), "Job Matches from SMU Hiring", professionalEmailContent.toString());
+        System.out.println("Sent Professional email");
     }
 
     public void deleteProfessionalRequest(String userId) {
@@ -628,7 +655,7 @@ public class SmuHiringDatabaseOperations {
 
     public void createJobMatching(String profUserId, String jobId, String company){
         try {
-            String query = "INSERT INTO JobMatching (userId, jobId, company) VALUES (?, ?, ?)";
+            String query = "INSERT IGNORE INTO JobMatching (userId, jobId, company) VALUES (?, ?, ?)";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, profUserId);
             preparedStatement.setString(2, jobId);
