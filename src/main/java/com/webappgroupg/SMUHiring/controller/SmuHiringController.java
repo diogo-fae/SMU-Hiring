@@ -99,6 +99,11 @@ public class SmuHiringController {
     }
 
     @PostMapping(value = "/requestJobMatching/{userId}")
+    public void requestJobMatching(@PathVariable("userId") String userId){
+        smuHiringService.requestJobMatching(userId);
+    }
+
+    @PostMapping(value = "/initiateJobMatching/{userId}")
     public void initiateJobMatching(@PathVariable("userId") String userId){
         smuHiringService.initiateJobMatching(userId);
     }

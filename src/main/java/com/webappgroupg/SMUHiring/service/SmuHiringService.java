@@ -170,4 +170,8 @@ public class SmuHiringService {
     public List<Employer> getDeleteEmployerRequests() {
         return smuHiringDatabaseOperations.getDeleteEmployerRequests();
     }
+
+    public void requestJobMatching(String userId) {
+        smuHiringDatabaseOperations.requestJobMatching(userId);
+    }
 }

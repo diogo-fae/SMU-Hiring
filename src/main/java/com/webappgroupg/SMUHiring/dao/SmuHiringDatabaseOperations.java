@@ -1345,4 +1345,16 @@ public class SmuHiringDatabaseOperations {
         }
         return employers;
     }
+
+    public void requestJobMatching(String userId) {
+        try {
+            String query = "INSERT INTO JobMatchingRequest (userId) VALUES (?)";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, userId);
+            preparedStatement.execute();
+            System.out.println("Job matching request created successfully.");
+        } catch (SQLException e) {
+            System.out.println("Exception while creating the job matching request - " + e.getMessage());
+        }
+    }
 }
