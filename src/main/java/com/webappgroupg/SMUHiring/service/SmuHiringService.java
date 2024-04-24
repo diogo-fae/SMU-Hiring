@@ -74,8 +74,12 @@ public class SmuHiringService {
         return smuHiringDatabaseOperations.approveAccountDeletion(userId);
     }
 
+    public void denyDeleteRequest(String userId) {
+        smuHiringDatabaseOperations.removeAccountDeletionRequest(userId);
+    }
+
     public void createStaff(User request) {
-        smuHiringDatabaseOperations.createUser(request.getUserId(), request.getFirstName(), request.getLastName(), request.getEmail(), request.getPhoneNumber(), request.getUserType());
+        smuHiringDatabaseOperations.createUser(request.getUserId(), request.getFirstName(), request.getLastName(), request.getEmail(), request.getPhoneNumber(), "S");
         smuHiringDatabaseOperations.addCredentials(request.getUserId());
     }
 

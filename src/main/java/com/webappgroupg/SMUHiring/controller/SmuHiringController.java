@@ -128,9 +128,14 @@ public class SmuHiringController {
         smuHiringService.createEmployer(request);
     }
 
-    @PostMapping(value = "/approveAccountDeletion/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/approveAccountDeletion/{userId}")
     public boolean approveAccountDeletion(@PathVariable("userId") String userId){
         return smuHiringService.approveAccountDeletion(userId);
+    }
+
+    @PostMapping(value ="/denyDeleteRequest/{userId}")
+    public void denyDeleteRequest(@PathVariable("userId") String userId){
+        smuHiringService.denyDeleteRequest(userId);
     }
 
     @PostMapping(value = "/createStaff", consumes = MediaType.APPLICATION_JSON_VALUE)
