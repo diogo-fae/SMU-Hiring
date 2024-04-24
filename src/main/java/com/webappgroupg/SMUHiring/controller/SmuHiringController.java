@@ -16,7 +16,7 @@ public class SmuHiringController {
     private SmuHiringService smuHiringService;
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object login(@RequestBody Cred cred){
+    public User login(@RequestBody Cred cred){
         return smuHiringService.login(cred);
     }
 
@@ -73,14 +73,14 @@ public class SmuHiringController {
         return smuHiringService.updateEmployer(request);
     }
 
-    @GetMapping(value = "/getAllJobs", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<JobPosting> getAllJobs() {
-        return smuHiringService.getAllJobs(); // Do we need job qualifications as well to be displayed here?
+    @GetMapping(value = "/getAllJobs/{company}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<JobPosting> getAllJobs(@PathVariable("company") String company) { //Employer
+        return smuHiringService.getAllJobs(company); // Do we need job qualifications as well to be displayed here?
     }
 
-    @GetMapping(value = "/getAllJobs/{company}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<JobPosting> getAllJobs(@PathVariable("company") String company) {
-        return smuHiringService.getAllJobs(company); // Do we need job qualifications as well to be displayed here?
+    @GetMapping(value = "/getAllJobs", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<JobPosting> getAllJobs() { //professional
+        return smuHiringService.getAllJobsForProfessional();
     }
 
     @PostMapping(value = "/requestProfessionalDelete/{userId}")
@@ -98,25 +98,20 @@ public class SmuHiringController {
         return smuHiringService.updateProfessional(request);
     }
 
-
-    //getAllJobs
-    //getJobInfo
-    //requestJobMatching
-
     @PostMapping(value = "/requestJobMatching/{userId}")
     public void initiateJobMatching(@PathVariable("userId") String userId){
-//        System.out.println("Received user id: " + userId);
         smuHiringService.initiateJobMatching(userId);
     }
 
-
+    @GetMapping(value = "/getStaffInfo/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public User getStaffInfo(@PathVariable("userId") String userId) {
+        return smuHiringService.getStaffInfo(userId);
+    }
 
     @PostMapping(value = "/makePayment", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Payment makePayment(@RequestBody Payment payment){
         return smuHiringService.makePayment(payment);
     }
-
-
 
     @PostMapping(value = "/deleteAccount/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void deleteAccount(@PathVariable("userId") String userId){
@@ -133,11 +128,6 @@ public class SmuHiringController {
         smuHiringService.createEmployer(request);
     }
 
-    @GetMapping(value = "/getNumberOfRequests/{userType}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public String getNumberOfRequests(@PathVariable("userType") String userType){
-       return smuHiringService.getNumberOfRequests(userType);
-    }
-
     @PostMapping(value = "/approveAccountDeletion/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public boolean approveAccountDeletion(@PathVariable("userId") String userId){
         return smuHiringService.approveAccountDeletion(userId);
@@ -147,5 +137,68 @@ public class SmuHiringController {
     public void createStaff(@RequestBody User request){
         smuHiringService.createStaff(request);
     }
+
+    @PostMapping(value = "/updateStaff", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void updateStaff(@RequestBody User request){
+        smuHiringService.updateStaff(request);
+    }
+
+    @GetMapping(value = "/getAllEmployers", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Employer> getAllEmployers() {
+        return smuHiringService.getAllEmployers();
+    }
+
+    @GetMapping(value = "/getAllProfessionals", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Professional> getAllProfessionals() {
+        return smuHiringService.getAllProfessionals();
+    }
+
+    @GetMapping(value = "/getJobMatchingRequests", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<JobMatchingRequest> getJobMatchingRequests() {
+        return smuHiringService.getJobMatchingRequests();
+    }
+
+    @PostMapping(value = "/approveCreateEmployerRequest/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void approveCreateEmployerRequest(@PathVariable("userId") String userId){
+        smuHiringService.approveCreateEmployerRequest(userId);
+    }
+
+    @PostMapping(value = "/approveCreateProfessionalRequest/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void approveCreateProfessionalRequest(@PathVariable("userId") String userId){
+        smuHiringService.approveCreateProfessionalRequest(userId);
+    }
+
+    @GetMapping(value = "/getCreateEmployerRequests", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<EmployerRequest> getCreateEmployerRequests() {
+        return smuHiringService.getCreateEmployerRequests();
+    }
+
+    /*@GetMapping(value = "/getDeleteEmployerRequests", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<JobMatchingRequest> getDeleteEmployerRequests() {
+        return smuHiringService.getDeleteEmployerRequests();
+    }*/
+
+    @GetMapping(value = "/getCreateProfessionalRequests", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<ProfessionalRequest> getCreateProfessionalRequests() {
+        return smuHiringService.getCreateProfessionalRequests();
+    }
+
+    /*@GetMapping(value = "/getDeleteProfessionalRequests", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<JobMatchingRequest> getDeleteProfessionalRequests() {
+        return smuHiringService.getDeleteProfessionalRequests();
+    }*/
+
+    @PostMapping(value = "/denyCreateEmployerRequest/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void denyCreateEmployerRequest(@PathVariable("userId") String userId){
+        smuHiringService.denyCreateEmployerRequest(userId);
+    }
+
+    @PostMapping(value = "/denyCreateProfessionalRequest/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void denyCreateProfessionalRequest(@PathVariable("userId") String userId){
+        smuHiringService.denyCreateProfessionalRequest(userId);
+    }
+
+    //denyCreateEmployerRequest
+    //denyCreateProfessionalRequest
 
 }

@@ -13,9 +13,9 @@ public class User {
     private String firstName;
     private String lastName;
     private String email;
-    private long phoneNumber;
+    private String phoneNumber;
     private String status;
-    private Character userType;
+    private String userType;
     private List<Payment> paymentList;
 
 }

@@ -15,13 +15,13 @@ public class JobPosting {
     private String positionName;
     private String supervisorFirstName;
     private String supervisorLastName;
-    private Long supervisorPhoneNumber;
+    private String supervisorPhoneNumber;
     private String supervisorEmail;
     private String startDate;
     private String endDate;
     private String startTime;
     private String endTime;
-    private double payPerHour;
+    private String payPerHour;
     private Map<String, List<String>> jobQualificationsList;
 
     public JobPosting() {

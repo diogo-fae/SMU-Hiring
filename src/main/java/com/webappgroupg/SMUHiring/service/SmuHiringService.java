@@ -23,7 +23,7 @@ public class SmuHiringService {
         smuHiringDatabaseOperations.registerEmployerAccountRequest(request);
     }
 
-    public Object login(Cred cred) {
+    public User login(Cred cred) {
         return smuHiringDatabaseOperations.getLoginDetails(cred);
     }
 
@@ -48,8 +48,6 @@ public class SmuHiringService {
         smuHiringDatabaseOperations.postJob(request);
     }
 
-
-
     public Payment makePayment(Payment payment) {
         return smuHiringDatabaseOperations.makePayment(payment);
     }
@@ -66,10 +64,7 @@ public class SmuHiringService {
     }
 
     public void createEmployer(EmployerRequest request) {
-    }
-
-    public String getNumberOfRequests(String userType) {
-        return "";
+        smuHiringDatabaseOperations.createEmployer(request);
     }
 
     public boolean approveAccountDeletion(String userId) {
@@ -77,6 +72,7 @@ public class SmuHiringService {
     }
 
     public void createStaff(User request) {
+        smuHiringDatabaseOperations.createUser(request.getUserId(), request.getFirstName(), request.getLastName(), request.getEmail(), request.getPhoneNumber(), request.getUserType());
     }
 
     public void deleteJob(JobPosting request) {
@@ -95,15 +91,59 @@ public class SmuHiringService {
         return smuHiringDatabaseOperations.getEmployerInfo(userId);
     }
 
-    public List<JobPosting> getAllJobs() {
-        return smuHiringDatabaseOperations.getAllJobs();
-    }
-
     public List<JobPosting> getAllJobs(String company) {
         return smuHiringDatabaseOperations.getAllJobs(company);
     }
 
     public Professional getProfessionalInfo(String userId) {
         return smuHiringDatabaseOperations.getProfessionalInfo(userId);
+    }
+
+    public User getStaffInfo(String userId) {
+        return smuHiringDatabaseOperations.getStaffInfo(userId);
+    }
+
+    public void updateStaff(User request) {
+        smuHiringDatabaseOperations.updateUser(request.getFirstName(), request.getLastName(), request.getEmail(), request.getPhoneNumber(), request.getUserId());
+    }
+
+    public List<Employer> getAllEmployers() {
+        return smuHiringDatabaseOperations.getAllEmployers();
+    }
+
+    public List<Professional> getAllProfessionals() {
+        return smuHiringDatabaseOperations.getAllProfessionals();
+    }
+
+    public List<JobMatchingRequest> getJobMatchingRequests() {
+        return smuHiringDatabaseOperations.getJobMatchingRequests();
+    }
+
+    public void approveCreateEmployerRequest(String userId) {
+        smuHiringDatabaseOperations.approveCreateEmployerRequest(userId);
+    }
+
+    public List<JobPosting> getAllJobsForProfessional() {
+        return smuHiringDatabaseOperations.getAllJobs();
+    }
+
+    public List<EmployerRequest> getCreateEmployerRequests() {
+        return smuHiringDatabaseOperations.getCreateEmployerRequests();
+    }
+
+    public List<ProfessionalRequest> getCreateProfessionalRequests() {
+        return smuHiringDatabaseOperations.getCreateProfessionalRequests();
+    }
+
+    public void approveCreateProfessionalRequest(String userId) {
+        smuHiringDatabaseOperations.approveCreateProfessionalRequest(userId);
+    }
+
+    public void denyCreateEmployerRequest(String userId) {
+        smuHiringDatabaseOperations.removeEmployerCreateRequest(userId);
+    }
+
+    public void denyCreateProfessionalRequest(String userId) {
+        smuHiringDatabaseOperations.removeProfessionalCreateRequest(userId);
     }
 }

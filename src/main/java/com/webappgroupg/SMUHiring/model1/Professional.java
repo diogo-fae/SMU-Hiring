@@ -15,13 +15,13 @@ public class Professional {
     private String firstName;
     private String lastName;
     private String email;
-    private long phoneNumber;
+    private String phoneNumber;
     private String status;
     private String address1;
     private String address2;
     private String city;
     private String state;
-    private int zipCode;
+    private String zipCode;
     private String university;
     private String graduationDate;
     private String degreeType;
