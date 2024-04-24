@@ -73,6 +73,7 @@ public class SmuHiringService {
 
     public void createStaff(User request) {
         smuHiringDatabaseOperations.createUser(request.getUserId(), request.getFirstName(), request.getLastName(), request.getEmail(), request.getPhoneNumber(), request.getUserType());
+        smuHiringDatabaseOperations.addCredentials(request.getUserId());
     }
 
     public void deleteJob(JobPosting request) {

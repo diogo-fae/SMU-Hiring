@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.batch.BatchProperties;
 @Getter
 @Setter
 public class JobPosting {
-    private int jobId;
+    private String jobId;
     private String company;
     private String positionName;
     private String supervisorName;
@@ -19,7 +19,7 @@ public class JobPosting {
     private String endTime;
     private double payPerHour;
 
-    public JobPosting(int jobId, String company, String positionName, String supervisorName, String supervisorEmail, String startDate, String endDate, String startTime, String endTime, double payPerHour) {
+    public JobPosting(String jobId, String company, String positionName, String supervisorName, String supervisorEmail, String startDate, String endDate, String startTime, String endTime, double payPerHour) {
         this.jobId = jobId;
         this.company = company;
         this.positionName = positionName;

@@ -10,7 +10,7 @@ import java.util.Map;
 @Getter
 @Setter
 public class JobPosting {
-    private int jobId;
+    private String jobId;
     private String company;
     private String positionName;
     private String supervisorFirstName;
@@ -26,7 +26,7 @@ public class JobPosting {
 
     public JobPosting() {
     }
-    public JobPosting(int jobId, String company) {
+    public JobPosting(String jobId, String company) {
         this.jobId = jobId;
         this.company = company;
     }
