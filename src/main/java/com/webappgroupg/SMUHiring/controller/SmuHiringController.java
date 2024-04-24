@@ -21,13 +21,13 @@ public class SmuHiringController {
     }
 
     @PostMapping(value = "/registerProfessional", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void registerProfessional(@RequestBody ProfessionalRequest request){
-        smuHiringService.registerProfessional(request);
+    public boolean registerProfessional(@RequestBody ProfessionalRequest request){
+        return smuHiringService.registerProfessional(request);
     }
 
     @PostMapping(value = "/registerEmployer", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void registerEmployer(@RequestBody EmployerRequest request){
-        smuHiringService.registerEmployer(request);
+    public boolean registerEmployer(@RequestBody EmployerRequest request){
+        return smuHiringService.registerEmployer(request);
     }
 
     @PostMapping(value = "/postJob", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -61,7 +61,7 @@ public class SmuHiringController {
     }
 
     @GetMapping(value = "/getJobInfo", produces = MediaType.APPLICATION_JSON_VALUE)
-    public JobPosting getJobInfo(@RequestParam("jobId") int jobId, @RequestParam("company") String company) {
+    public JobPosting getJobInfo(@RequestParam("jobId") String jobId, @RequestParam("company") String company) {
 //        System.out.println("Received user id: " + jobId + " and company: " + company);
         // Assuming smuHiringService.getJobInfo(jobId, company) retrieves job information based on jobId and company
         return smuHiringService.getJobInfo(jobId, company);
@@ -173,20 +173,20 @@ public class SmuHiringController {
         return smuHiringService.getCreateEmployerRequests();
     }
 
-    /*@GetMapping(value = "/getDeleteEmployerRequests", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<JobMatchingRequest> getDeleteEmployerRequests() {
+    @GetMapping(value = "/getDeleteEmployerRequests", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Employer> getDeleteEmployerRequests() {
         return smuHiringService.getDeleteEmployerRequests();
-    }*/
+    }
 
     @GetMapping(value = "/getCreateProfessionalRequests", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ProfessionalRequest> getCreateProfessionalRequests() {
         return smuHiringService.getCreateProfessionalRequests();
     }
 
-    /*@GetMapping(value = "/getDeleteProfessionalRequests", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<JobMatchingRequest> getDeleteProfessionalRequests() {
+    @GetMapping(value = "/getDeleteProfessionalRequests", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Professional> getDeleteProfessionalRequests() {
         return smuHiringService.getDeleteProfessionalRequests();
-    }*/
+    }
 
     @PostMapping(value = "/denyCreateEmployerRequest/{userId}")
     public void denyCreateEmployerRequest(@PathVariable("userId") String userId){
@@ -197,8 +197,5 @@ public class SmuHiringController {
     public void denyCreateProfessionalRequest(@PathVariable("userId") String userId){
         smuHiringService.denyCreateProfessionalRequest(userId);
     }
-
-    //denyCreateEmployerRequest
-    //denyCreateProfessionalRequest
 
 }

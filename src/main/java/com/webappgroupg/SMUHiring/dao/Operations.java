@@ -1206,5 +1206,10 @@ public class Operations {
 
     }*/
 
-    //Sujana
+
+    //String startDate = request.getGraduationDate();
+    //SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
+    //java.util.Date date = sdf1.parse(startDate);
+    //java.sql.Date sqlStartDate = new java.sql.Date(date.getTime());
+
 }

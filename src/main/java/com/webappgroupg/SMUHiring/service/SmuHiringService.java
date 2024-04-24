@@ -18,13 +18,12 @@ public class SmuHiringService {
     @Autowired
     private SmuHiringDatabaseOperations smuHiringDatabaseOperations;
 
-    public void registerProfessional(ProfessionalRequest request) {
-        smuHiringDatabaseOperations.registerProfessionalAccountRequest(request);
-        smuHiringDatabaseOperations.registerProfessionalQualificationRequest(request.getUserId(), request.getProfessionalQualificationRequest());
+    public boolean registerProfessional(ProfessionalRequest request) {
+       return smuHiringDatabaseOperations.registerProfessionalAccountRequest(request);
     }
 
-    public void registerEmployer(EmployerRequest request) {
-        smuHiringDatabaseOperations.registerEmployerAccountRequest(request);
+    public boolean registerEmployer(EmployerRequest request) {
+        return smuHiringDatabaseOperations.registerEmployerAccountRequest(request);
     }
 
     public User login(Cred cred) {
@@ -36,7 +35,7 @@ public class SmuHiringService {
         return smuHiringDatabaseOperations.updateProfessional(request);
     }
 
-    public JobPosting getJobInfo(int jobId, String company) {
+    public JobPosting getJobInfo(String jobId, String company) {
         return smuHiringDatabaseOperations.getJobInfo(jobId, company);
     }
 
@@ -105,7 +104,7 @@ public class SmuHiringService {
     }
 
     public User getStaffInfo(String userId) {
-        return smuHiringDatabaseOperations.getStaffInfo(userId);
+        return smuHiringDatabaseOperations.getUser(userId);
     }
 
     public void updateStaff(User request) {
@@ -145,11 +144,26 @@ public class SmuHiringService {
     }
 
     public void denyCreateEmployerRequest(String userId) {
+        EmployerRequest employerRequest = smuHiringDatabaseOperations.getCreateEmployerRequest(userId);
         smuHiringDatabaseOperations.removeEmployerCreateRequest(userId);
+        String content = "We regret to inform that the employer qualification requirements does not satisfy our criteria for \n" +
+                "username: " + employerRequest.getUserId() + "\n.";
+        smuHiringDatabaseOperations.sendEmail(employerRequest.getEmail(), "Employer Registration Denied", content);
     }
 
     public void denyCreateProfessionalRequest(String userId) {
+        ProfessionalRequest professionalRequest = smuHiringDatabaseOperations.getCreateProfessionalRequest(userId);
         smuHiringDatabaseOperations.removeProfessionalCreateRequest(userId);
+        String content = "We regret to inform that the professional qualifications does not meet our requirement for \n" +
+                "username: " + professionalRequest.getUserId() + "\n.";
+        smuHiringDatabaseOperations.sendEmail(professionalRequest.getEmail(), "Professional Registration Denied", content);
     }
 
+    public List<Professional> getDeleteProfessionalRequests() {
+        return smuHiringDatabaseOperations.getDeleteProfessionalRequests();
+    }
+
+    public List<Employer> getDeleteEmployerRequests() {
+        return smuHiringDatabaseOperations.getDeleteEmployerRequests();
+    }
 }
