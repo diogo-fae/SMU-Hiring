@@ -832,7 +832,7 @@ public class SmuHiringDatabaseOperations {
         String pwd = createEmployer(employerRequest);
         removeEmployerCreateRequest(userId);
         sendEmail(employerRequest.getEmail(), "Employer Registered Successfully", userId, pwd);
-        return EmployerRequest;
+        return employerRequest;
     }
 
     public String createEmployer(EmployerRequest request) {
@@ -1064,10 +1064,11 @@ public class SmuHiringDatabaseOperations {
         }
     }
 
-    public void createProfessional(ProfessionalRequest request) {
+    public String createProfessional(ProfessionalRequest request) {
+        String pwd = "";
         try {
             createUser(request.getUserId(), request.getFirstName(), request.getLastName(), request.getEmail(), request.getPhoneNumber(), "P");
-            addCredentials(request.getUserId());
+            pwd = addCredentials(request.getUserId());
             String query = "INSERT INTO Professional (userId, address1, address2, city, state, zipCode, university, graduationDate, degreeType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, request.getUserId());
@@ -1089,6 +1090,7 @@ public class SmuHiringDatabaseOperations {
         } catch (SQLException e) {
             System.out.println("Exception while creating the employer account - " + e.getMessage());
         }
+        return pwd;
     }
 
     private void sendEmail(String emailId, String subject, String userId, String pwd) {
