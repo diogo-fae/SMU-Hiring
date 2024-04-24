@@ -216,6 +216,29 @@ public class SmuHiringDatabaseOperations {
         return qualifications;
     }
 
+    public Map<String, List<String>> getProfessionalQualificationsRequest(String userId) {
+        Map<String, List<String>> qualifications = new HashMap<>();
+        try {
+            String query = "SELECT * FROM ProfessionalQualificationRequest WHERE userId = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                String category = resultSet.getString("category");
+                String keyword = resultSet.getString("keyword");
+                if (qualifications.containsKey(category)) {
+                    qualifications.get(category).add(keyword);
+                } else {
+                    qualifications.put(category, new ArrayList<String>());
+                    qualifications.get(category).add(keyword);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while retrieving professional qualifications: " + e.getMessage());
+        }
+        return qualifications;
+    }
+
     public Map<String, List<String>> getJobQualifications(int userId, String company) {
         Map<String, List<String>> qualifications = new HashMap<>();
         try {
@@ -832,7 +855,7 @@ public class SmuHiringDatabaseOperations {
         String pwd = createEmployer(employerRequest);
         removeEmployerCreateRequest(userId);
         sendEmail(employerRequest.getEmail(), "Employer Registered Successfully", userId, pwd);
-        return EmployerRequest;
+        return employerRequest;
     }
 
     public String createEmployer(EmployerRequest request) {
@@ -969,6 +992,7 @@ public class SmuHiringDatabaseOperations {
                 professionalRequest.setUniversity(resultSet.getString("university"));
                 professionalRequest.setGraduationDate(resultSet.getDate("graduationDate").toString());
                 professionalRequest.setDegreeType(resultSet.getString("degreeType"));
+                professionalRequest.setProfessionalQualificationRequest(getProfessionalQualificationsRequest(professionalRequest.getUserId()));
                 // Need to check if the qualification list is to be set or not
                 professionalRequests.add(professionalRequest);
             }

@@ -158,12 +158,12 @@ public class SmuHiringController {
         return smuHiringService.getJobMatchingRequests();
     }
 
-    @PostMapping(value = "/approveCreateEmployerRequest/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/approveCreateEmployerRequest/{userId}")
     public EmployerRequest approveCreateEmployerRequest(@PathVariable("userId") String userId){
         return smuHiringService.approveCreateEmployerRequest(userId);
     }
 
-    @PostMapping(value = "/approveCreateProfessionalRequest/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/approveCreateProfessionalRequest/{userId}")
     public void approveCreateProfessionalRequest(@PathVariable("userId") String userId){
         smuHiringService.approveCreateProfessionalRequest(userId);
     }
@@ -188,12 +188,12 @@ public class SmuHiringController {
         return smuHiringService.getDeleteProfessionalRequests();
     }*/
 
-    @PostMapping(value = "/denyCreateEmployerRequest/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/denyCreateEmployerRequest/{userId}")
     public void denyCreateEmployerRequest(@PathVariable("userId") String userId){
         smuHiringService.denyCreateEmployerRequest(userId);
     }
 
-    @PostMapping(value = "/denyCreateProfessionalRequest/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/denyCreateProfessionalRequest/{userId}")
     public void denyCreateProfessionalRequest(@PathVariable("userId") String userId){
         smuHiringService.denyCreateProfessionalRequest(userId);
     }
