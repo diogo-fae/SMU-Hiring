@@ -1,12 +1,5 @@
 package com.webappgroupg.SMUHiring.dao;
 
-import com.webappgroupg.SMUHiring.model1.*;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.*;
-
 public class Operations {
 
    /* public User login(String username, String password) {

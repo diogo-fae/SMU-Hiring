@@ -1,15 +1,17 @@
 package com.webappgroupg.SMUHiring.dao;
 
-import com.webappgroupg.SMUHiring.model1.*;
+import com.webappgroupg.SMUHiring.model.*;
 import io.micrometer.common.util.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import java.sql.*;
-import java.sql.Date;
 import java.util.*;
-import java.time.*;
 import java.text.SimpleDateFormat;
 import java.math.BigDecimal;
 
@@ -811,7 +813,7 @@ public class SmuHiringDatabaseOperations {
     public List<JobMatchingRequest> getJobMatchingRequests() {
         List<JobMatchingRequest> jobMatchingRequests = new ArrayList<>();
         try {
-            String query = "SELECT userId FROM JobMatchingRequests";
+            String query = "SELECT userId FROM JobMatchingRequest";
             preparedStatement = connection.prepareStatement(query);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
@@ -825,16 +827,19 @@ public class SmuHiringDatabaseOperations {
         return jobMatchingRequests;
     }
 
-    public void approveCreateEmployerRequest(String userId) {
+    public EmployerRequest approveCreateEmployerRequest(String userId) {
         EmployerRequest employerRequest = getCreateEmployerRequest(userId);
-        createEmployer(employerRequest);
+        String pwd = createEmployer(employerRequest);
         removeEmployerCreateRequest(userId);
+        sendEmail(employerRequest.getEmail(), "Employer Registered Successfully", userId, pwd);
+        return EmployerRequest;
     }
 
-    public void createEmployer(EmployerRequest request) {
+    public String createEmployer(EmployerRequest request) {
+        String password = "";
         try {
             createUser(request.getUserId(), request.getFirstName(), request.getLastName(), request.getEmail(), request.getPhoneNumber(), "E");
-            addCredentials(request.getUserId());
+            password = addCredentials(request.getUserId());
             String query = "INSERT INTO Employer (userId, address1, address2, city, state, zipCode, company) VALUES (?, ?, ?, ?, ?, ?, ?)";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, request.getUserId());
@@ -848,9 +853,10 @@ public class SmuHiringDatabaseOperations {
         } catch (SQLException e) {
             System.out.println("Exception while creating the employer account - " + e.getMessage());
         }
+        return password;
     }
 
-    public void addCredentials(String userId) {
+    public String addCredentials(String userId) {
         String password = generateRandomString();
         try {
             String query = "INSERT INTO Credentials (userId, password) VALUES (?, ?)";
@@ -861,6 +867,7 @@ public class SmuHiringDatabaseOperations {
         } catch (SQLException e) {
             System.out.println("Exception while adding credentials - " + e.getMessage());
         }
+        return password;
     }
 
     public static String generateRandomString() {
@@ -1037,10 +1044,12 @@ public class SmuHiringDatabaseOperations {
         }
     }
 
-    public void approveCreateProfessionalRequest(String userId) {
+    public ProfessionalRequest approveCreateProfessionalRequest(String userId) {
         ProfessionalRequest professionalRequest = getCreateProfessionalRequest(userId);
-        createProfessional(professionalRequest);
+        String pwd = createProfessional(professionalRequest);
         removeProfessionalCreateRequest(userId);
+        sendEmail(professionalRequest.getEmail(), "Professional Registered Successfully", userId, pwd);
+        return professionalRequest;
     }
 
     public void removeProfessionalCreateRequest(String userId) {
@@ -1080,6 +1089,43 @@ public class SmuHiringDatabaseOperations {
         } catch (SQLException e) {
             System.out.println("Exception while creating the employer account - " + e.getMessage());
         }
+    }
+
+    private void sendEmail(String emailId, String subject, String userId, String pwd) {
+        try {
+            final String username = "smu.hiring.app@gmail.com";
+            final String password = "fupavceiljeibozr";
+            Properties prop = new Properties();
+            prop.put("mail.smtp.auth", true);
+            prop.put("mail.smtp.starttls.enable", "true");
+            prop.put("mail.smtp.host", "smtp.gmail.com");
+            prop.put("mail.smtp.port", 587);
+            prop.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+
+            Session session = Session.getInstance(prop, new Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(username, password);
+                }
+            });
+
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(username));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(emailId));
+            message.setSubject(subject);
+            MimeBodyPart mimeBodyPart = new MimeBodyPart();
+            String content = "Please find your login details below: \n" +
+                    "username: " + username + "\n" + "password: " + password + "\n" +
+                    "We have created a one time password. Please reset your password later.";
+            mimeBodyPart.setContent(content, "text/html; charset=utf-8");
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(mimeBodyPart);
+            message.setContent(multipart);
+            Transport.send(message);
+        } catch (MessagingException exception){
+            System.out.println("Exception while sending email: "+ exception.getMessage());
+        }
+
     }
 
 }

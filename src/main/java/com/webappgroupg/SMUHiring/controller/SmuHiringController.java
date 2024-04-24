@@ -1,7 +1,7 @@
 package com.webappgroupg.SMUHiring.controller;
 
-import com.webappgroupg.SMUHiring.model1.Cred;
-import com.webappgroupg.SMUHiring.model1.*;
+import com.webappgroupg.SMUHiring.model.Cred;
+import com.webappgroupg.SMUHiring.model.*;
 import com.webappgroupg.SMUHiring.service.SmuHiringService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -159,8 +159,8 @@ public class SmuHiringController {
     }
 
     @PostMapping(value = "/approveCreateEmployerRequest/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void approveCreateEmployerRequest(@PathVariable("userId") String userId){
-        smuHiringService.approveCreateEmployerRequest(userId);
+    public EmployerRequest approveCreateEmployerRequest(@PathVariable("userId") String userId){
+        return smuHiringService.approveCreateEmployerRequest(userId);
     }
 
     @PostMapping(value = "/approveCreateProfessionalRequest/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)

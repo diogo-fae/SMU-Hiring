@@ -11,17 +11,19 @@ import java.util.Map;
 @Getter
 @Setter
 public class JobQualifications {
-    private int jobId;
+    private String jobId;
     private String company;
+    private String category;
+    private String keyword;
     // Dictionary with category as key and list of qualifications as value
     private Map<String, List<String>> qualifications;
 
-    public JobQualifications(int jobId, String company, Map<String, List<String>> qualifications) {
+    public JobQualifications(String jobId, String company, Map<String, List<String>> qualifications) {
         this.jobId = jobId;
         this.company = company;
         this.qualifications = qualifications;
     }
-    public JobQualifications(int jobId, String company) {
+    public JobQualifications(String jobId, String company) {
         this.jobId = jobId;
         this.company = company;
         this.qualifications = new HashMap<>();

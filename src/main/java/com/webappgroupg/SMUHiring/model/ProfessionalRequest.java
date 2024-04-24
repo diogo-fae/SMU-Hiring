@@ -1,10 +1,9 @@
-package com.webappgroupg.SMUHiring.model1;
+package com.webappgroupg.SMUHiring.model;
 
 
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 

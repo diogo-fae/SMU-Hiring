@@ -1,12 +1,16 @@
 package com.webappgroupg.SMUHiring.service;
 
 import com.webappgroupg.SMUHiring.dao.SmuHiringDatabaseOperations;
-import com.webappgroupg.SMUHiring.model1.Cred;
-import com.webappgroupg.SMUHiring.model1.*;
+import com.webappgroupg.SMUHiring.model.Cred;
+import com.webappgroupg.SMUHiring.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.*;
+import javax.mail.*;
+import javax.mail.internet.*;
+import javax.mail.Session;
+import javax.mail.Transport;
 
 @Component
 public class SmuHiringService {
@@ -120,8 +124,8 @@ public class SmuHiringService {
         return smuHiringDatabaseOperations.getJobMatchingRequests();
     }
 
-    public void approveCreateEmployerRequest(String userId) {
-        smuHiringDatabaseOperations.approveCreateEmployerRequest(userId);
+    public EmployerRequest approveCreateEmployerRequest(String userId) {
+        return smuHiringDatabaseOperations.approveCreateEmployerRequest(userId);
     }
 
     public List<JobPosting> getAllJobsForProfessional() {
@@ -147,4 +151,5 @@ public class SmuHiringService {
     public void denyCreateProfessionalRequest(String userId) {
         smuHiringDatabaseOperations.removeProfessionalCreateRequest(userId);
     }
+
 }
