@@ -256,12 +256,12 @@ public class SmuHiringDatabaseOperations {
         return qualifications;
     }
 
-    public Map<String, List<String>> getJobQualifications(int userId, String company) {
+    public Map<String, List<String>> getJobQualifications(String jobId, String company) {
         Map<String, List<String>> qualifications = new HashMap<>();
         try {
             String query = "SELECT * FROM JobQualification WHERE jobId = ? AND company = ?";
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, userId);
+            preparedStatement.setString(1, jobId);
             preparedStatement.setString(2, company);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
@@ -285,11 +285,11 @@ public class SmuHiringDatabaseOperations {
         try {
             String query = "SELECT * FROM JobPosting WHERE jobId = ? AND company = ?";
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, Integer.parseInt(jobId));
+            preparedStatement.setString(1, jobId);
             preparedStatement.setString(2, company);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                jobPosting.setJobId(String.valueOf(resultSet.getInt("jobId")));
+                jobPosting.setJobId(resultSet.getString("jobId"));
                 jobPosting.setCompany(resultSet.getString("company"));
                 jobPosting.setPositionName(resultSet.getString("positionName"));
                 jobPosting.setSupervisorFirstName(resultSet.getString("supervisorFirstName"));
@@ -301,7 +301,7 @@ public class SmuHiringDatabaseOperations {
                 jobPosting.setStartTime(resultSet.getTime("startTime").toString());
                 jobPosting.setEndTime(resultSet.getTime("endTime").toString());
                 jobPosting.setPayPerHour(String.valueOf(resultSet.getDouble("payPerHour")));
-                jobPosting.setJobQualificationsList(getJobQualifications(Integer.parseInt(jobId), company));
+                jobPosting.setJobQualificationsList(getJobQualifications(jobId, company));
             }
         } catch (SQLException e) {
             System.out.println("Exception while retrieving job posting Info: " + e.getMessage());
@@ -603,7 +603,7 @@ public class SmuHiringDatabaseOperations {
             try {
                 while (jobsWithCategory.next()) {
                     // Get details of the job
-                    Integer jobId = jobsWithCategory.getInt("jobId");
+                    String jobId = jobsWithCategory.getString("jobId");
                     String company = jobsWithCategory.getString("company");
                     String keyword_from_job = jobsWithCategory.getString("keyword");
 
@@ -626,12 +626,12 @@ public class SmuHiringDatabaseOperations {
         return jobIds;
     }
 
-    public void createJobMatching(String profUserId, Integer jobId, String company){
+    public void createJobMatching(String profUserId, String jobId, String company){
         try {
             String query = "INSERT INTO JobMatching (userId, jobId, company) VALUES (?, ?, ?)";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, profUserId);
-            preparedStatement.setInt(2, jobId);
+            preparedStatement.setString(2, jobId);
             preparedStatement.setString(3, company);
             preparedStatement.execute();
         } catch (SQLException e) {
@@ -655,7 +655,7 @@ public class SmuHiringDatabaseOperations {
         try {
             String query = "INSERT INTO JobPosting (jobId, company, positionName, supervisorFirstName, supervisorLastName, supervisorEmail, supervisorPhoneNumber, startDate, endDate, startTime, endTime, payPerHour) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, Integer.parseInt(request.getJobId()));
+            preparedStatement.setString(1, request.getJobId());
             preparedStatement.setString(2, request.getCompany());
             preparedStatement.setString(3, request.getPositionName());
             preparedStatement.setString(4, request.getSupervisorFirstName());
@@ -700,7 +700,7 @@ public class SmuHiringDatabaseOperations {
         try {
             String query = "DELETE FROM JobPosting WHERE jobId = ? AND company = ?";
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, Integer.parseInt(request.getJobId()));
+            preparedStatement.setString(1, request.getJobId());
             preparedStatement.setString(2, request.getCompany());
             preparedStatement.executeUpdate();
 
@@ -710,7 +710,7 @@ public class SmuHiringDatabaseOperations {
                     for (String keyword : professionalQualificationRequest.getValue()) {
                         query = "DELETE FROM JobQualification WHERE jobId = ? AND company = ?";
                         preparedStatement = connection.prepareStatement(query);
-                        preparedStatement.setInt(1, Integer.parseInt(request.getJobId()));
+                        preparedStatement.setString(1, request.getJobId());
                         preparedStatement.setString(2, request.getCompany());
                         preparedStatement.executeUpdate();
                     }
@@ -736,14 +736,14 @@ public class SmuHiringDatabaseOperations {
             preparedStatement.setTime(8, java.sql.Time.valueOf(request.getStartTime()));
             preparedStatement.setTime(9, java.sql.Time.valueOf(request.getEndTime()));
             preparedStatement.setDouble(10, Double.parseDouble(request.getPayPerHour()));
-            preparedStatement.setInt(11, Integer.parseInt(request.getJobId()));
+            preparedStatement.setString(11, request.getJobId());
             preparedStatement.setString(12, request.getCompany());
             preparedStatement.executeUpdate();
 
             if(!CollectionUtils.isEmpty(request.getJobQualificationsList())) {
                 query = "DELETE FROM JobQualification WHERE jobId = ? AND company = ?";
                 preparedStatement = connection.prepareStatement(query);
-                preparedStatement.setInt(1, Integer.parseInt(request.getJobId()));
+                preparedStatement.setString(1, request.getJobId());
                 preparedStatement.setString(2, request.getCompany());
                 preparedStatement.executeUpdate();
 
@@ -752,7 +752,7 @@ public class SmuHiringDatabaseOperations {
                     for (String keyword : professionalQualificationRequest.getValue()) {
                         query = "INSERT INTO JobQualification (jobId, company, category, keyword) VALUES (?, ?, ?, ?)";
                         preparedStatement = connection.prepareStatement(query);
-                        preparedStatement.setInt(1, Integer.parseInt(request.getJobId()));
+                        preparedStatement.setString(1, request.getJobId());
                         preparedStatement.setString(2, request.getCompany());
                         preparedStatement.setString(3, category);
                         preparedStatement.setString(4, keyword);
@@ -821,7 +821,7 @@ public class SmuHiringDatabaseOperations {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 JobPosting jobPosting = new JobPosting();
-                jobPosting.setJobId(String.valueOf(resultSet.getInt("jobId")));
+                jobPosting.setJobId(resultSet.getString("jobId"));
                 jobPosting.setCompany(resultSet.getString("company"));
                 jobPosting.setPositionName(resultSet.getString("positionName"));
                 jobPosting.setSupervisorFirstName(resultSet.getString("supervisorFirstName"));
@@ -849,7 +849,7 @@ public class SmuHiringDatabaseOperations {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 JobPosting jobPosting = new JobPosting();
-                jobPosting.setJobId(String.valueOf(resultSet.getInt("jobId")));
+                jobPosting.setJobId(resultSet.getString("jobId"));
                 jobPosting.setCompany(resultSet.getString("company"));
                 jobPosting.setPositionName(resultSet.getString("positionName"));
                 jobPosting.setSupervisorFirstName(resultSet.getString("supervisorFirstName"));
