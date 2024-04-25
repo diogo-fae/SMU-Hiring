@@ -183,6 +183,11 @@ public class SmuHiringController {
         smuHiringService.userLoggedIn(userId);
     }
 
+    @GetMapping(value = "/isUserIdUnique/{userId}")
+    public boolean isUserIdUnique(@PathVariable("userId") String userId){
+        return smuHiringService.isUserIdUnique(userId);
+    }
+
     @GetMapping(value = "/getCreateEmployerRequests", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<EmployerRequest> getCreateEmployerRequests() {
         return smuHiringService.getCreateEmployerRequests();

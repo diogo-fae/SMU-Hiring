@@ -151,6 +151,10 @@ public class SmuHiringService {
         smuHiringDatabaseOperations.userLoggedIn(userId);
     }
 
+    public boolean isUserIdUnique(String userId) {
+        return smuHiringDatabaseOperations.isUserIdUnique(userId);
+    }
+
     public void denyCreateEmployerRequest(String userId) {
         EmployerRequest employerRequest = smuHiringDatabaseOperations.getCreateEmployerRequest(userId);
         smuHiringDatabaseOperations.removeEmployerCreateRequest(userId);

@@ -1239,6 +1239,21 @@ public class SmuHiringDatabaseOperations {
         }
     }
 
+    public boolean isUserIdUnique(String userId) {
+        try {
+            String query = "SELECT * FROM User WHERE userId = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return false;
+            }
+        } catch (SQLException e) {
+            System.out.println("Exception while checking if the user id is unique: " + e.getMessage());
+        }
+        return true;
+    }
+
     public ProfessionalRequest approveCreateProfessionalRequest(String userId) {
         // Get all details from Professional from the request table
         ProfessionalRequest professionalRequest = getCreateProfessionalRequest(userId);
