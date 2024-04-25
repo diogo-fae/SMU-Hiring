@@ -157,6 +157,7 @@ public class SmuHiringDatabaseOperations {
                                 user.setPhoneNumber(String.valueOf(resultSet.getLong("phoneNumber")));
                                 user.setStatus(resultSet.getString("status"));
                                 user.setUserType(resultSet.getString("userType"));
+                                user.setHasLoggedIn(resultSet.getBoolean("hasLoggedIn"));
                             }
                         }
                     } catch (SQLException e) {
@@ -1067,7 +1068,7 @@ public class SmuHiringDatabaseOperations {
 
     public void createUser(String userId, String firstName, String lastName, String email, String phoneNumber, String userType) {
         try {
-            String query = "INSERT INTO User (userId, firstName, lastName, email, phoneNumber, status, userType) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            String query = "INSERT INTO User (userId, firstName, lastName, email, phoneNumber, status, userType, hasLoggedIn) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, userId);
             preparedStatement.setString(2, firstName);
@@ -1076,6 +1077,7 @@ public class SmuHiringDatabaseOperations {
             preparedStatement.setLong(5, Long.parseLong(phoneNumber));
             preparedStatement.setString(6, "active");
             preparedStatement.setString(7, userType);
+            preparedStatement.setBoolean(8, false);
             preparedStatement.execute();
         } catch (SQLException e) {
             System.out.println("Exception while creating the employer account - " + e.getMessage());
@@ -1221,6 +1223,19 @@ public class SmuHiringDatabaseOperations {
             System.out.println("Employer request has been removed successfully.");
         } catch (SQLException e) {
             System.out.println("Exception while removing the employer request - " + e.getMessage());
+        }
+    }
+
+    public void userLoggedIn(String userId) {
+        try {
+            String query = "UPDATE User SET hasLoggedIn = ? WHERE userId = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setBoolean(1, true);
+            preparedStatement.setString(2, userId);
+            preparedStatement.executeUpdate();
+            System.out.println("User has logged in successfully.");
+        } catch (SQLException e) {
+            System.out.println("Exception while updating the user account - " + e.getMessage());
         }
     }
 

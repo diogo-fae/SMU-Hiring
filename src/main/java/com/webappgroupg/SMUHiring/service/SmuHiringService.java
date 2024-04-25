@@ -147,6 +147,10 @@ public class SmuHiringService {
         smuHiringDatabaseOperations.approveCreateProfessionalRequest(userId);
     }
 
+    public void userLoggedIn(String userId) {
+        smuHiringDatabaseOperations.userLoggedIn(userId);
+    }
+
     public void denyCreateEmployerRequest(String userId) {
         EmployerRequest employerRequest = smuHiringDatabaseOperations.getCreateEmployerRequest(userId);
         smuHiringDatabaseOperations.removeEmployerCreateRequest(userId);

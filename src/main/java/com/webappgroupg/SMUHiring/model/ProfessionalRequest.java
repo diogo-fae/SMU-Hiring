@@ -26,5 +26,6 @@ public class ProfessionalRequest {
     private String graduationDate;
     private String degreeType;
     private Map<String, List<String>> professionalQualificationRequest;
+    private boolean hasLoggedIn;
 
 }

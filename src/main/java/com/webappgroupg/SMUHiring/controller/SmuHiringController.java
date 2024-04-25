@@ -178,6 +178,11 @@ public class SmuHiringController {
         smuHiringService.approveCreateProfessionalRequest(userId);
     }
 
+    @PostMapping(value = "/userLoggedIn/{userId}")
+    public void userLoggedIn(@PathVariable("userId") String userId){
+        smuHiringService.userLoggedIn(userId);
+    }
+
     @GetMapping(value = "/getCreateEmployerRequests", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<EmployerRequest> getCreateEmployerRequests() {
         return smuHiringService.getCreateEmployerRequests();
