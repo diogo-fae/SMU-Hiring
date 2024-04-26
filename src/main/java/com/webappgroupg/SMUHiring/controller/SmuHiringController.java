@@ -218,4 +218,9 @@ public class SmuHiringController {
         smuHiringService.denyCreateProfessionalRequest(userId);
     }
 
+    @GetMapping(value = "/getPaymentHistory/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Payment> getPaymentHistory(@PathVariable("userId") String userId) {
+        return smuHiringService.getPaymentHistory(userId);
+    }
+
 }

@@ -182,4 +182,8 @@ public class SmuHiringService {
     public void requestJobMatching(String userId) {
         smuHiringDatabaseOperations.requestJobMatching(userId);
     }
+
+    public List<Payment> getPaymentHistory(String userId) {
+        return smuHiringDatabaseOperations.getPayments(userId);
+    }
 }

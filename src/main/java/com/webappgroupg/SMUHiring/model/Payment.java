@@ -12,5 +12,6 @@ public class Payment {
     private String paymentAmount;
     private String paymentDate;
     private String dueDate;
+    private String remainingBalance;
 
 }

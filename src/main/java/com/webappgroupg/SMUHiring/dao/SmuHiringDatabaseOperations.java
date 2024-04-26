@@ -15,13 +15,15 @@ import java.util.*;
 import java.text.SimpleDateFormat;
 import java.math.BigDecimal;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 @Component
 public class SmuHiringDatabaseOperations {
     private Connection connection = null;
     private PreparedStatement preparedStatement;
     private ResultSet resultSet;
     private static final String DB_URL = "jdbc:mysql://localhost:3306/smu_hiring";
-    private static final String DB_USER = "smu_user";
+    private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "password";
 
     public SmuHiringDatabaseOperations() {
@@ -133,7 +135,6 @@ public class SmuHiringDatabaseOperations {
     }
 
     public User getLoginDetails(Cred cred) {
-        boolean isValidUser = false;
         User user = new User();
         try {
             String query = "SELECT password FROM Credentials WHERE userId = ?";
@@ -142,7 +143,6 @@ public class SmuHiringDatabaseOperations {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 if (resultSet.getString("password").equals(cred.getPwd())) {
-                    isValidUser = true;
                     try {
                         query = "SELECT * FROM User WHERE userId = ?";
                         preparedStatement = connection.prepareStatement(query);
@@ -414,29 +414,25 @@ public class SmuHiringDatabaseOperations {
 
     public Payment makePayment(Payment request) {
         Payment payment = new Payment();
+        List<Payment> payments = new ArrayList<>();
         try {
-            payment = getPayment(request.getUserId());
-            if (StringUtils.isEmpty(payment.getPaymentId())) {
-                String query = "INSERT INTO Payment (userId, paymentId, paymentAmount, dueDate, paymentDate) VALUES (?, ?, ?, ?, ?)";
-                preparedStatement = connection.prepareStatement(query);
-                preparedStatement.setString(1, request.getUserId());
-                preparedStatement.setString(2, request.getPaymentId());
-                preparedStatement.setDouble(3, Double.parseDouble(request.getPaymentAmount()));
-                preparedStatement.setDate(4, java.sql.Date.valueOf(request.getDueDate()));
-                preparedStatement.setDate(5, java.sql.Date.valueOf(java.time.LocalDate.now()));
-                preparedStatement.execute();
-            } else {
-                String query = "UPDATE payment SET paymentAmount = ?, paymentDate = ? WHERE userid = ?";
-                preparedStatement = connection.prepareStatement(query);
-                BigDecimal b1 = BigDecimal.valueOf(Double.parseDouble(payment.getPaymentAmount()));
-                BigDecimal b2 = BigDecimal.valueOf(Double.parseDouble(request.getPaymentAmount()));
-                BigDecimal b3 = b1.subtract(b2);
-                preparedStatement.setDouble(1, b3.doubleValue());
-                preparedStatement.setDate(2, java.sql.Date.valueOf(java.time.LocalDate.now()));
-                preparedStatement.setString(3, request.getUserId());
-                preparedStatement.executeUpdate();
-                payment = getPayment(request.getUserId());
-            }
+            Payment payObj = getPaymentPage(request.getUserId());
+            String query = "INSERT INTO Payment (userId, paymentId, paymentAmount, dueDate, paymentDate) VALUES (?, ?, ?, ?, ?)";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, request.getUserId());
+            preparedStatement.setString(2, String.valueOf(ThreadLocalRandom.current().nextInt(1, 100000 + 1)));
+            preparedStatement.setDouble(3, Double.parseDouble(request.getPaymentAmount()));
+            preparedStatement.setDate(4, java.sql.Date.valueOf(payObj.getDueDate()));
+            preparedStatement.setDate(5, java.sql.Date.valueOf(java.time.LocalDate.now()));
+            preparedStatement.execute();
+
+            payment.setUserId(request.getUserId());
+            payment.setDueDate(payObj.getDueDate());
+
+            BigDecimal b1 = BigDecimal.valueOf(Double.parseDouble(payObj.getRemainingBalance()));
+            BigDecimal b2 = BigDecimal.valueOf(Double.parseDouble(request.getPaymentAmount()));
+            BigDecimal b3 = b1.subtract(b2);
+            payment.setRemainingBalance(String.valueOf(b3));
             System.out.println("Payment made successfully.");
         } catch (SQLException e) {
             System.out.println("Exception while making payment - " + e.getMessage());
@@ -444,24 +440,45 @@ public class SmuHiringDatabaseOperations {
         return payment;
     }
 
-    public Payment getPayment(String userId) {
+    public Payment getPaymentPage(String userId) {
         Payment payment = new Payment();
+        List<Payment> payments = new ArrayList<>();
+        payments = getPayments(userId);
+        if (CollectionUtils.isEmpty(payments)) {
+            payment.setRemainingBalance("0");
+            payment.setDueDate("04/30/2024");
+        } else {
+            Double remainingBalance = 0.0;
+            for(Payment payObj: payments) {
+                remainingBalance = remainingBalance + Double.parseDouble(payObj.getPaymentAmount());
+                payment.setDueDate(payObj.getDueDate());
+            }
+            payment.setRemainingBalance(String.valueOf(remainingBalance));
+        }
+        System.out.println("Payment made successfully.");
+        return payment;
+    }
+
+    public List<Payment> getPayments(String userId) {
+        List<Payment> payments = new ArrayList<>();
         try {
             String query = "SELECT * FROM Payment WHERE userId = ?";
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, userId);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
+                Payment payment = new Payment();
                 payment.setPaymentId(resultSet.getString("paymentId"));
                 payment.setUserId(resultSet.getString("userId"));
                 payment.setPaymentAmount(String.valueOf(resultSet.getDouble("paymentAmount")));
                 payment.setPaymentDate(resultSet.getDate("paymentDate").toString());
                 payment.setDueDate(resultSet.getDate("dueDate").toString());
+                payments.add(payment);
             }
         } catch (SQLException e) {
             System.out.println("Exception while retrieving payments: " + e.getMessage());
         }
-        return payment;
+        return payments;
     }
 
     public boolean approveAccountDeletion(String userId) {
@@ -1414,4 +1431,5 @@ public class SmuHiringDatabaseOperations {
             System.out.println("Exception while creating the job matching request - " + e.getMessage());
         }
     }
+
 }
